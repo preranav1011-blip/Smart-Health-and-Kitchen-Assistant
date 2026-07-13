@@ -1,0 +1,56 @@
+#menuToggle {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    cursor: pointer;
+    z-index: 1001; /* Keeps it above the sidebar */
+    width: 30px;   /* Adjust size as needed */
+}
+
+.options {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;         /* Width of your dashboard */
+    height: 100%;
+    background-color: #2c3e50; /* Dark professional background */
+    padding-top: 60px;    /* Space at the top so it doesn't cover the menu icon */
+    
+    /* Smooth sliding transition */
+    transition: transform 0.3s ease;
+    transform: translateX(-100%); /* Hides it off-screen to the left */
+    z-index: 1000;
+}
+
+.options.active {
+    transform: translateX(0);
+}
+
+.options a {
+    display: block;
+    color: white;
+    padding: 15px 25px;
+    text-decoration: none;
+    font-size: 18px;
+    transition: background 0.2s;
+}
+
+.options a:hover {
+    background-color: #34495e;
+}
+
+.sub-menu a {
+    padding-left: 45px; /* Pushes sub-items to the right */
+    font-size: 16px;    /* Makes them slightly smaller */
+    background-color: #243342; /* Slightly darker background for depth */
+}
+/* body {
+    display: block;
+    background-color: lightcyan;
+
+}
+
+.options
+{
+    display: block;
+} */

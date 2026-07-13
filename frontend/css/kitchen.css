@@ -1,0 +1,78 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body
+{
+    background-color: lightcyan;
+    height: 100vh;
+}
+
+.container
+{
+    display: flex;
+    height: 100%;
+}
+
+.summary
+{
+    width: 300px;
+    background-color: #b2daf1;
+    padding: 25px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05); /* Soft divider shadow */
+    display: flex;
+    flex-direction: column;
+}
+
+
+.summary h2 {
+    color: #333;
+    font-size: 1.5rem;
+}
+
+.summary hr {
+    border: 0;
+    border-top: 1px solid #eee;
+}
+
+.search-section {
+    flex-grow: 1; /* Takes up all remaining width */
+    display: flex;
+    justify-content: center; /* Centers the search box horizontally */
+    align-items: center;     /* Centers the search box vertically */
+    padding: 20px;
+}
+
+.search-box {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 500px; /* Keeps the search box at a suitable, responsive length */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.search-box label {
+    font-weight: 600;
+    color: #555;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.search-box input:focus {
+    border-color: #008b8b; 
+}

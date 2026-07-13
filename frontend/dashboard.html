@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Smart Health and Kitchen Assistant</title>
+        <link rel = "icon" href = "images/Gemini_Generated_Image_7rve5h7rve5h7rve.png">
+        <link rel="stylesheet" href="css/dashboard.css">
+    </head>
+    <body>
+        <img src="images/threelines.png" id="menuToggle" alt="Menu">
+        <nav class="options" id="sidebar">
+            <a href="#" class="home">Home</a>
+
+            <div class="menu-group">
+                <a href="#" class="inventory">Inventory</a>
+                <div class="sub-menu">
+                    <a href="#" class="food">Food</a>
+                    <a href="#" class="meds">Medicines</a>
+                </div>
+            </div>
+
+            <a href="#" class="recipe">Recipes</a>
+            <a href="#" class="cart">Your Cart</a>
+            <a href="#" class="notifs">Notifications</a>
+            <a href="#" class="insights">Insights</a>
+            <a href="#" class="sets">Settings</a>
+            <a href="#" class="help">Help</a>
+            <a href="#" class="logout">Log Out</a>
+        </nav>
+
+        <script>
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+
+            menuToggle.addEventListener('click', () => {
+                // This toggles the 'active' class on and off when clicked
+                sidebar.classList.toggle('active');
+            });
+        </script>
+    </body>
+</html>

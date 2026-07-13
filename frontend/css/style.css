@@ -1,0 +1,93 @@
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;     /* Stacks the heading on top of the boxes */
+    justify-content: center;    /* Centers everything vertically */
+    align-items: center;        /* Centers everything horizontally */
+    background-color: lightcyan;
+    font-family: sans-serif;
+    position: relative;
+}
+
+/* Positions the auth boxes at the top right */
+.auth-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 15px;                  /* Space between Login and Sign Up boxes */
+}
+
+/* Styling for both Auth boxes */
+.auth-btn {
+    text-decoration: none;      /* Removes the default underline from links */
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 4px;         /* Gives slight rounded corners */
+    transition: all 0.2s ease;  /* Smooth hover effect */
+}
+
+.login-btn {
+    color: green;
+    border: 2px solid green;
+    background-color: transparent;
+}
+
+.login-btn:hover {
+    background-color: green;
+    color: white;
+}
+
+/* Individual styling for Sign Up Box */
+.signup-btn {
+    color: white;
+    background-color: green;
+    border: 2px solid green;
+}
+
+.signup-btn:hover {
+    background-color: darkgreen;
+    border-color: darkgreen;
+}
+h1 {
+    text-align: center;
+    color: green;
+    font-size: 40px;
+    font-style: italic;
+    margin: 0;
+    margin-bottom: 40px;        /* Pushes the boxes down, lifting the heading up */
+}
+
+p{
+    text-align: center;
+    color: rgb(210, 30, 66);
+    font-size: 20px;
+    font-style: oblique;
+}
+
+/* Puts the 4 items at the literal bottom */
+.footer-container {
+    position: absolute;
+    bottom: 40px;              /* 40px away from the bottom edge */
+    left: 50%;
+    transform: translateX(-50%); 
+    width: 100%;
+}
+
+.box-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;                  
+}
+
+.box-container h5 {
+    margin: 0;
+    font-size: 16px;
+    color: #333;
+    background-color: white;    /* Optional: Adds a white pill background to make them look like buttons */
+    padding: 8px 16px;
+    border-radius: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}

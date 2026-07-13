@@ -1,0 +1,100 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: lightcyan;
+    height: 100vh;
+    display: flex;
+    flex-direction: column; /* Stacks the top bar above the main layout */
+}
+
+/* --- TOP NAVBAR (Amazon Style) --- */
+.top-navbar {
+    /*background-color: #131921; *//* Classic dark sleek color, change to #ffffff if you prefer light */
+    background-color: lightcyan;
+    color: black;
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    gap: 30px;
+    height: 60px;
+}
+
+.top-navbar .logo {
+    font-weight: bold;
+    font-size: 1.2rem;
+    white-space: nowrap;
+}
+
+/* The wrapper that centers the search bar and sets a proper length */
+.search-container {
+    display: flex;
+    flex-grow: 1;
+    max-width: 700px; /* Limits width so it doesn't stretch too thin on wide monitors */
+    margin: 0 auto;  /* Centers the search block horizontally inside the header */
+}
+
+.search-container input {
+    width: 100%;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px 0 0 4px; /* Rounds only the left corners */
+    font-size: 0.95rem;
+    outline: none;
+}
+
+.search-container .search-btn {
+    background-color: #febd69; /* Amazon-style orange accent */
+    border: none;
+    padding: 0 20px;
+    color: black;
+    font-weight: 600;
+    border-radius: 0 4px 4px 0; /* Rounds only the right corners */
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.search-container .search-btn:hover {
+    background-color: #f3a847;
+}
+
+/* --- MAIN LAYOUT (Below the Top Bar) --- */
+.main-layout {
+    display: flex;
+    flex-grow: 1; /* Fills up the rest of the vertical screen space */
+}
+
+/* Left Side Summary Panel */
+.summary-panel {
+    width: 280px;
+    background-color: #ffffff;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+}
+
+.summary-panel h2 {
+    font-size: 1.25rem;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.summary-panel hr {
+    border: 0;
+    border-top: 1px solid #eee;
+    margin-bottom: 15px;
+}
+
+.stat-item {
+    margin-bottom: 12px;
+    color: #555;
+}
+
+/* Main Workspace Area */
+.content-area {
+    flex-grow: 1;
+    padding: 25px;
+}
