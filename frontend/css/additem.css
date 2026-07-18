@@ -1,0 +1,133 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body{
+    background:#f4f7f6;
+}
+
+.top-navbar{
+    background:#2e7d32;
+    color:white;
+    padding:18px 40px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:24px;
+    font-weight:bold;
+}
+
+.container{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:50px;
+}
+
+.form-card{
+
+    width:600px;
+    background:white;
+    border-radius:15px;
+    padding:35px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.1);
+
+}
+
+.form-card h1{
+
+    text-align:center;
+    color:#2e7d32;
+    margin-bottom:10px;
+
+}
+
+.subtitle{
+
+    text-align:center;
+    color:#666;
+    margin-bottom:30px;
+
+}
+
+.input-group{
+
+    display:flex;
+    flex-direction:column;
+    margin-bottom:20px;
+
+}
+
+label{
+
+    font-weight:600;
+    margin-bottom:8px;
+
+}
+
+input,
+select{
+
+    padding:12px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    font-size:16px;
+
+}
+
+input:focus,
+select:focus{
+
+    border-color:#2e7d32;
+    outline:none;
+
+}
+
+.buttons{
+
+    display:flex;
+    justify-content:space-between;
+    margin-top:30px;
+
+}
+
+.save-btn{
+
+    background:#2e7d32;
+    color:white;
+    border:none;
+    padding:12px 35px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:16px;
+    transition:0.3s;
+
+}
+
+.save-btn:hover{
+
+    background:#1b5e20;
+
+}
+
+.cancel-btn{
+
+    background:#d32f2f;
+    color:white;
+    border:none;
+    padding:12px 35px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:16px;
+    transition:0.3s;
+
+}
+
+.cancel-btn:hover{
+
+    background:#b71c1c;
+
+}

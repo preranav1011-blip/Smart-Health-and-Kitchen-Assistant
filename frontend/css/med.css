@@ -1,0 +1,179 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f4f7f6; /* Clean, clinical off-white */
+    height: 100vh;
+    display: flex;
+    flex-direction: column; 
+}
+
+/* --- TOP NAVBAR --- */
+.top-navbar {
+    background-color: #1a2b3c; /* Professional deep navy */
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    padding: 10px 24px;
+    gap: 30px;
+    height: 65px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.top-navbar .logo {
+    font-weight: 700;
+    font-size: 1.3rem;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: 0.5px;
+}
+
+.med-icon {
+    color: #00d2c4; /* Medical teal accent */
+}
+
+/* Search Wrapper */
+.search-container {
+    display: flex;
+    flex-grow: 1;
+    max-width: 750px; 
+    margin: 0 auto;  
+}
+
+.search-container input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #ced4da;
+    border-radius: 4px 0 0 4px; 
+    font-size: 0.95rem;
+    outline: none;
+    background-color: #ffffff;
+}
+
+.search-container .search-btn {
+    background-color: #007bff; /* Clinical Blue */
+    border: none;
+    padding: 0 24px;
+    color: white;
+    font-weight: 600;
+    border-radius: 0 4px 4px 0; 
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.search-container .search-btn:hover {
+    background-color: #0056b3;
+}
+
+/* --- MAIN LAYOUT --- */
+.main-layout {
+    display: flex;
+    flex-grow: 1; 
+}
+
+/* Left Side Summary Panel */
+.summary-panel {
+    width: 300px;
+    background-color: #ffffff;
+    padding: 24px;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.04);
+    border-right: 1px solid #e9ecef;
+}
+
+.summary-panel h2 {
+    font-size: 1.15rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 15px;
+    color: #495057;
+}
+
+.summary-panel hr {
+    border: 0;
+    border-top: 1px solid #dee2e6;
+    margin-bottom: 20px;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    color: #495057;
+    padding: 8px 12px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    font-size: 0.95rem;
+}
+
+/* Conditional Alert States */
+.stat-item.critical {
+    border-left: 4px solid #dc3545;
+    background-color: #fff5f5;
+}
+.stat-item.critical span {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.stat-item.warning {
+    border-left: 4px solid #ffc107;
+    background-color: #fffbeb;
+}
+.stat-item.warning span {
+    color: #b7791f;
+    font-weight: bold;
+}
+
+.stat-item.alert {
+    border-left: 4px solid #6f42c1;
+    background-color: #f3f0ff;
+}
+.stat-item.alert span {
+    color: #6f42c1;
+    font-weight: bold;
+}
+
+/* Main Workspace Area */
+.content-area {
+    flex-grow: 1;
+    padding: 30px;
+}
+
+/* Floating Add Stock Button */
+.add-item-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #10b981; /* Emerald safety green */
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 14px 22px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    transition: all 0.2s ease-in-out;
+}
+
+.add-item-btn:hover {
+    background-color: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(5, 150, 105, 0.4);
+}
+
+.plus-icon {
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1;
+}

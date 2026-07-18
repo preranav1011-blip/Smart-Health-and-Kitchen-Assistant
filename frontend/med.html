@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Smart Health and Kitchen Assistant</title>
+        <link rel = "icon" href = "images/Gemini_Generated_Image_7rve5h7rve5h7rve.png">
+        <link rel="stylesheet" href="css/med.css">
+    </head>
+    <body>
+        <header class="top-navbar">
+            <div class="logo">
+                <span class="med-icon">✚</span> MedStock IQ
+            </div>
+            <div class="search-container">
+                <input type="text" id="search" placeholder="Search by generic name, brand, batch ID, or location...">
+                <button type="button" class="search-btn">Search</button>
+            </div>
+        </header>
+
+        <div class="main-layout">
+            <aside class="summary-panel">
+                <h2>Inventory Summary</h2>
+                <hr>
+                <div class="stat-item">
+                    <strong>Total SKUs:</strong> <span>148</span>
+                </div>
+                <div class="stat-item critical">
+                    <strong>Critical Shortage:</strong> <span>4</span>
+                </div>
+                <div class="stat-item warning">
+                    <strong>Expiring (&lt; 30 Days):</strong> <span>7</span>
+                </div>
+                <div class="stat-item alert">
+                    <strong>Expired Batches:</strong> <span>2</span>
+                </div>
+                <div class="stat-item">
+                    <strong>Controlled Substances:</strong> <span>12</span>
+                </div>
+            </aside>
+
+            <main class="content-area">
+                <p style="color: #6c757d; font-style: italic;">Select a category or search above to view current pharmaceutical stock levels...</p>
+            </main>
+        </div>
+
+        <!-- Floating Add Stock Button -->
+        <button class="add-item-btn">
+            <span class="plus-icon">+</span>
+            <span>Log New Batch</span>
+        </button>
+    </body>
+</html>
