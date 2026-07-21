@@ -5,6 +5,7 @@ form.addEventListener("submit", function (event) {
     event.preventDefault();
 
     const item = {
+        id: Date.now(),
         name: document.getElementById("itemName").value,
         category: document.getElementById("category").value,
         quantity: document.getElementById("quantity").value,

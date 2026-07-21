@@ -30,11 +30,11 @@ function displayItems(data = items) {
 
                 <p><strong>Expiry:</strong> ${item.expiryDate}</p>
 
-                <button class="edit-btn" onclick="editItem(items.indexOf(item))">
+                <button class="edit-btn" onclick="editItem(${item.id})">
                     Edit
                 </button>
 
-                <button class="delete-btn" onclick="deleteItem(items.indexOf(item))">
+                <button class="delete-btn" onclick="deleteItem(${item.id})">
                     Delete
                 </button>
 
@@ -43,11 +43,11 @@ function displayItems(data = items) {
     });
 }
 
-function deleteItem(index) {
+function deleteItem(id) {
 
     if (confirm("Delete this item?")) {
 
-        items.splice(index, 1);
+        items = items.filter(item => item.id !== id);
 
         localStorage.setItem("inventory", JSON.stringify(items));
 
@@ -55,9 +55,9 @@ function deleteItem(index) {
     }
 }
 
-function editItem(index) {
+function editItem(id) {
 
-    let item = items[index];
+    let item = items.find(item => item.id === id);
 
     let newName = prompt("Enter Item Name", item.name);
 
