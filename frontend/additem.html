@@ -6,27 +6,25 @@
     <link rel="stylesheet" href="css/additem.css">
 </head>
 <body>
-
     <header class="top-navbar">
         <div class="logo">Kitchen Inventory</div>
     </header>
 
     <div class="container">
-
         <div class="form-card">
             <h1>Add New Item</h1>
             <p class="subtitle">Fill in the details below to add an item to your inventory.</p>
 
-            <form>
+            <form id="addItemForm">
 
                 <div class="input-group">
                     <label>Item Name</label>
-                    <input type="text" placeholder="Example: Milk">
+                    <input type="text" id="itemName" placeholder="Example: Milk">
                 </div>
 
                 <div class="input-group">
                     <label>Category</label>
-                    <select>
+                    <select id="category">
                         <option>Vegetables</option>
                         <option>Fruits</option>
                         <option>Dairy</option>
@@ -38,12 +36,12 @@
 
                 <div class="input-group">
                     <label>Quantity</label>
-                    <input type="number" placeholder="Enter Quantity">
+                    <input type="number" id="quantity" placeholder="Enter Quantity">
                 </div>
 
                 <div class="input-group">
                     <label>Unit</label>
-                    <select>
+                    <select id="unit">
                         <option>kg</option>
                         <option>g</option>
                         <option>L</option>
@@ -54,21 +52,21 @@
 
                 <div class="input-group">
                     <label>Purchase Date</label>
-                    <input type="date">
+                    <input type="date" id="purchaseDate">
                 </div>
 
                 <div class="input-group">
                     <label>Expiry Date</label>
-                    <input type="date">
+                    <input type="date" id="expiryDate">
                 </div>
 
                 <div class="input-group">
                     <label>Upload Item Image</label>
-                    <input type="file">
+                    <input type="file" id="image">
                 </div>
 
                 <div class="buttons">
-                    <button class="save-btn">Save Item</button>
+                    <button type="submit" class="save-btn">Save Item</button>
                     <button class="cancel-btn" type="reset">Cancel</button>
                 </div>
 
@@ -77,6 +75,7 @@
         </div>
 
     </div>
+    <script src="javascript/additem.js"></script>
 
 </body>
 </html>

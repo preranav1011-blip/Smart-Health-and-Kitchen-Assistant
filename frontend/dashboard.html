@@ -8,24 +8,40 @@
     <body>
         <img src="images/threelines.png" id="menuToggle" alt="Menu">
         <nav class="options" id="sidebar">
-            <a href="#" class="home">Home</a>
+            <a href="index.html" class="home">Home</a>
 
             <div class="menu-group">
-                <a href="#" class="inventory">Inventory</a>
+                <a href="login.html" class="inventory">Inventory</a>
                 <div class="sub-menu">
-                    <a href="#" class="food">Food</a>
-                    <a href="#" class="meds">Medicines</a>
+                    <a href="kit.html" class="food">Food</a>
+                    <a href="med.html" class="meds">Medicines</a>
                 </div>
             </div>
 
-            <a href="#" class="recipe">Recipes</a>
-            <a href="#" class="cart">Your Cart</a>
-            <a href="#" class="notifs">Notifications</a>
+            <a href="recipes.html" class="recipe">Recipes</a>
+            <a href="yourcart.html" class="cart">Your Cart</a>
+            <a href="notif.html" class="notifs">Notifications</a>
             <a href="#" class="insights">Insights</a>
-            <a href="#" class="sets">Settings</a>
+            <a href="settings.html" class="sets">Settings</a>
             <a href="#" class="help">Help</a>
             <a href="#" class="logout">Log Out</a>
         </nav>
+
+        <div class="main-content">
+            <img src="images/user-circles-set_78370-4704.avif" alt="Profile" class="login-image">
+
+            <h1>Welcome Back</h1>
+
+            <div class="box-container">
+                <div class="health">
+                    <p>Health</p>
+                </div>
+
+                <div class="kitchen">
+                    <p>Kitchen</p>
+                </div>
+            </div>
+        </div>
 
         <script>
             const menuToggle = document.getElementById('menuToggle');

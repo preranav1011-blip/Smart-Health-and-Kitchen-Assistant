@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -6,15 +7,21 @@
         <link rel="stylesheet" href="css/login.css">
     </head>
     <body>
-        <img src="images/user-circles-set_78370-4704.avif" alt="Logo" class="login-image">
-        <h1>Welcome back</h1>
-        <div class="box-container">
-            <div class = "health">
-                <p>Health</p>
-            </div>
-            <div class = "kitchen">
-                <p>Kitchen</p>
-            </div>
+        <div class="login-container">
+            <h1>Login</h1>
+            <form action="#" method="post">
+                <div class="form-group">
+                    <label for="email">Enter Email</label>
+                    <input type="email" id="email" name="email" placeholder="abcde@gmail.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Enter password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+
+                <button type="submit" class="login-btn">Login</button>
+            </form>
         </div>
     </body>
 </html>

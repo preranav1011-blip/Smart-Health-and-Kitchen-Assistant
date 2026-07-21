@@ -1,0 +1,417 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',Tahoma,Gene,Verdana,sans-serif;
+}
+
+body{
+    background:#eef6ff;
+    color:#333;
+}
+
+/* ---------------- Navbar ---------------- */
+
+.top-navbar{
+
+    background:linear-gradient(135deg,#2563eb,#3b82f6);
+    color:white;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:18px 40px;
+
+    box-shadow:0 4px 15px rgba(0,0,0,0.15);
+
+}
+
+.logo{
+
+    font-size:28px;
+    font-weight:bold;
+    letter-spacing:1px;
+
+}
+
+.search-container{
+
+    display:flex;
+    gap:12px;
+
+}
+
+.search-container input{
+
+    width:280px;
+    padding:12px;
+    border:none;
+    border-radius:30px;
+    font-size:15px;
+
+}
+
+.search-container button{
+
+    padding:12px 22px;
+
+    border:none;
+
+    border-radius:30px;
+
+    background:#f59e0b;
+
+    color:white;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.search-container button:hover{
+
+    background:#d97706;
+
+}
+
+/* ---------------- Main ---------------- */
+
+main{
+
+    padding:40px;
+
+}
+
+/* ---------------- Categories ---------------- */
+
+.categories{
+
+    display:flex;
+
+    justify-content:center;
+
+    flex-wrap:wrap;
+
+    gap:18px;
+
+    margin-bottom:45px;
+
+}
+
+.categories button{
+
+    background:white;
+
+    border:none;
+
+    padding:14px 22px;
+
+    border-radius:30px;
+
+    font-size:16px;
+
+    cursor:pointer;
+
+    box-shadow:0 5px 12px rgba(0,0,0,.08);
+
+    transition:.3s;
+
+}
+
+.categories button:hover{
+
+    background:#2563eb;
+
+    color:white;
+
+    transform:translateY(-3px);
+
+}
+
+/* ---------------- Ingredients ---------------- */
+
+.ingredients h2{
+
+    color:#2563eb;
+
+    margin-bottom:20px;
+
+}
+
+.ingredient-list{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:15px;
+
+    margin-bottom:45px;
+
+}
+
+.ingredient-list span{
+
+    background:white;
+
+    padding:12px 20px;
+
+    border-radius:25px;
+
+    box-shadow:0 4px 10px rgba(0,0,0,.08);
+
+    transition:.3s;
+
+}
+
+.ingredient-list span:hover{
+
+    background:#2563eb;
+
+    color:white;
+
+}
+
+/* ---------------- Recipe Cards ---------------- */
+
+.recipes h2{
+
+    color:#2563eb;
+
+    margin-bottom:25px;
+
+}
+
+.recipe-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+
+    gap:30px;
+
+}
+
+.recipe-card{
+
+    background:white;
+
+    border-radius:18px;
+
+    overflow:hidden;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.12);
+
+    transition:.3s;
+
+}
+
+.recipe-card:hover{
+
+    transform:translateY(-8px);
+
+}
+
+.recipe-card img{
+
+    width:100%;
+
+    height:220px;
+
+    object-fit:cover;
+
+}
+
+.recipe-content{
+
+    padding:20px;
+
+}
+
+.recipe-content h3{
+
+    color:#2563eb;
+
+    margin-bottom:10px;
+
+}
+
+.recipe-content p{
+
+    color:#666;
+
+    margin:8px 0;
+
+}
+
+.rating{
+
+    font-size:20px;
+
+    margin:15px 0;
+
+}
+
+/* ---------------- Buttons ---------------- */
+
+.buttons{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    margin-top:18px;
+
+}
+
+.buttons button{
+
+    border:none;
+
+    padding:11px 18px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    font-weight:600;
+
+    transition:.3s;
+
+}
+
+.buttons button:first-child{
+
+    background:#2563eb;
+
+    color:white;
+
+}
+
+.buttons button:last-child{
+
+    background:#f59e0b;
+
+    color:white;
+
+}
+
+.buttons button:hover{
+
+    transform:scale(1.05);
+
+}
+
+/* ---------------- Healthy Recommendation ---------------- */
+
+.healthy{
+
+    margin-top:60px;
+
+}
+
+.healthy h2{
+
+    color:#2563eb;
+
+    margin-bottom:20px;
+
+}
+
+.healthy-card{
+
+    background:linear-gradient(135deg,#2563eb,#60a5fa);
+
+    color:white;
+
+    padding:35px;
+
+    border-radius:20px;
+
+    text-align:center;
+
+    box-shadow:0 10px 20px rgba(0,0,0,.15);
+
+}
+
+.healthy-card h3{
+
+    font-size:28px;
+
+    margin-bottom:20px;
+
+}
+
+.healthy-card p{
+
+    margin:10px 0;
+
+    font-size:17px;
+
+}
+
+.healthy-card button{
+
+    margin-top:20px;
+
+    background:#f59e0b;
+
+    color:white;
+
+    border:none;
+
+    padding:12px 25px;
+
+    border-radius:30px;
+
+    font-size:16px;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.healthy-card button:hover{
+
+    background:#d97706;
+
+}
+
+/* ---------------- Responsive ---------------- */
+
+@media(max-width:768px){
+
+.top-navbar{
+
+    flex-direction:column;
+
+    gap:20px;
+
+}
+
+.search-container{
+
+    width:100%;
+
+}
+
+.search-container input{
+
+    width:100%;
+
+}
+
+.buttons{
+
+    flex-direction:column;
+
+    gap:10px;
+
+}
+
+}

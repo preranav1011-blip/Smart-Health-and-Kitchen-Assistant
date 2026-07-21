@@ -7,6 +7,60 @@
     width: 30px;   /* Adjust size as needed */
 }
 
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;     /* Stacks the heading on top of the boxes */
+    justify-content: center;    /* Centers everything vertically */
+    align-items: center;        /* Centers everything horizontally */
+    background-color: lightcyan;
+    font-family: sans-serif;
+    position: relative;
+}
+
+h1 {
+    text-align: center;
+    color: green;
+    font-size: 30px;
+    font-style: italic;
+    margin: 0;
+    margin-bottom: 40px;        /* Pushes the boxes down, lifting the heading up */
+}
+
+/* Flexbox container to put Health and Kitchen side-by-side */
+.box-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;                  /* Creates a clean space between the two boxes */
+}
+
+.health {
+    background-color: #fff3cd;  /* Added a light yellow background */
+    width: 300px;
+    color: #856404;
+    border: 3px solid #856404;
+    text-align: center;
+    padding: 15px;
+}
+
+.kitchen {
+    background-color: #fff3cd;  /* Added a light yellow background */
+    width: 300px;
+    color: #856404;
+    border: 3px solid #856404;
+    text-align: center;
+    padding: 15px;
+}
+
+.login-image{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 50px;
+    height: auto;
+}
+
 .options {
     position: fixed;
     top: 0;
