@@ -131,7 +131,16 @@ body {
     line-height: 1;
 }
 
-.card {
+/* .card {
+    background: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+} */
+
+.card{
+    position: relative;
     background: white;
     padding: 20px;
     margin-bottom: 20px;
@@ -174,4 +183,135 @@ body {
 
 .delete-btn:hover{
     background:#c62828;
+}
+
+.stat-item {
+    margin-bottom: 15px;
+    color: #555;
+    font-size: 18px;
+}
+
+.stat-item span {
+    font-weight: bold;
+    color: #1e88e5;
+    font-size: 22px;
+}
+
+/* .safe{
+    color:green;
+    font-weight:bold;
+}
+
+.warning{
+    color:orange;
+    font-weight:bold;
+}
+
+.danger{
+    color:red;
+    font-weight:bold;
+}
+
+.expired{
+    color:darkred;
+    font-weight:bold;
+    font-size:17px;
+} */
+
+/* Safe (Green) */
+.card.safe{
+    border-left:8px solid #2ecc71;
+}
+
+/* Expiring Soon (Yellow) */
+.card.warning{
+    border-left:8px solid #f1c40f;
+}
+
+/* Critical (Red) */
+.card.danger{
+    border-left:8px solid #e74c3c;
+}
+
+/* Expired (Dark Red) */
+.card.expired{
+    border-left:8px solid #8b0000;
+    background:#fff5f5;
+}
+
+.status-badge{
+    position:absolute;
+    top:15px;
+    right:15px;
+    padding:6px 12px;
+    border-radius:20px;
+    color:white;
+    font-size:13px;
+    font-weight:bold;
+}
+
+/* Badge Colors */
+
+.status-badge.safe{
+    background:#2ecc71;
+}
+
+.status-badge.warning{
+    background:#f1c40f;
+    color:black;
+}
+
+.status-badge.danger{
+    background:#e74c3c;
+}
+
+.status-badge.expired{
+    background:#8b0000;
+}
+
+/* Card Borders */
+
+.card.safe{
+    border-left:8px solid #2ecc71;
+}
+
+.card.warning{
+    border-left:8px solid #f1c40f;
+}
+
+.card.danger{
+    border-left:8px solid #e74c3c;
+}
+
+.card.expired{
+    border-left:8px solid #8b0000;
+    background:#fff5f5;
+}
+
+/* .low-stock{
+    background: #ff9800;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 13px;
+    font-weight: bold;
+    margin-left: 8px;
+} */
+
+.low-stock{
+    display: inline-block;
+    background: #ff9800;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.badges{
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    flex-wrap: wrap;
 }
