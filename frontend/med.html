@@ -20,21 +20,48 @@
             <aside class="summary-panel">
                 <h2>Inventory Summary</h2>
                 <hr>
-                <div class="stat-item">
-                    <strong>Total SKUs:</strong> <span>148</span>
+
+                <div class="stat-item filter-item active-filter" id="all-filter"
+                    onclick="filterMedicines('all', this)">
+                    <strong>Total SKUs:</strong>
+                    <span id="total-skus">0</span>
                 </div>
-                <div class="stat-item critical">
-                    <strong>Critical Shortage:</strong> <span>4</span>
+
+                <div class="stat-item filter-item"
+                    onclick="filterMedicines('lowstock', this)">
+                    <strong>Low Stock:</strong>
+                    <span id="low-stock">0</span>
                 </div>
-                <div class="stat-item warning">
-                    <strong>Expiring (&lt; 30 Days):</strong> <span>7</span>
+
+                <div class="stat-item critical filter-item"
+                    onclick="filterMedicines('critical', this)">
+                    <strong>Critical (&lt;=2 Days):</strong>
+                    <span id="critical-medicines">0</span>
                 </div>
-                <div class="stat-item alert">
-                    <strong>Expired Batches:</strong> <span>2</span>
+
+                <div class="stat-item warning filter-item"
+                    onclick="filterMedicines('expiring', this)">
+                    <strong>Expiring Soon:</strong>
+                    <span id="expiring-medicines">0</span>
                 </div>
-                <div class="stat-item">
-                    <strong>Controlled Substances:</strong> <span>12</span>
+
+                <div class="stat-item alert filter-item"
+                    onclick="filterMedicines('expired', this)">
+                    <strong>Expired Batches:</strong>
+                    <span id="expired-medicines">0</span>
                 </div>
+
+                <div class="stat-item filter-item"
+                    onclick="filterMedicines('safe', this)">
+                    <strong>Safe Medicines:</strong>
+                    <span id="safe-medicines">0</span>
+                </div>
+
+                <div class="stat-item filter-item">
+                    <strong>Controlled Substances:</strong>
+                    <span id="controlled-substances">0</span>
+                </div>
+
             </aside>
 
             <main class="content-area">
@@ -43,9 +70,10 @@
         </div>
 
         <!-- Floating Add Stock Button -->
-        <button class="add-item-btn">
+        <button class="add-item-btn" id="addMedicineBtn">
             <span class="plus-icon">+</span>
             <span>Log New Batch</span>
         </button>
+        <script src="javascript/medicine.js"></script>
     </body>
 </html>

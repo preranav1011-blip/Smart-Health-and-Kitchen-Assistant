@@ -7,6 +7,20 @@
     </head>
     <body>
         <header class="top-navbar">
+            <div class="filter-container">
+
+                <button class="filter-btn active" onclick="filterItems('all', this)">All</button>
+
+                <button class="filter-btn" onclick="filterItems('fresh', this)">Fresh</button>
+
+                <button class="filter-btn" onclick="filterItems('expiring', this)">Expiring Soon</button>
+
+                <button class="filter-btn" onclick="filterItems('critical', this)">Critical</button>
+
+                <button class="filter-btn" onclick="filterItems('expired', this)">Expired</button>
+
+            </div>
+
             <div class="logo">Kitchen Inventory</div>
             <div class="search-container">
                 <input type="text" id="search" placeholder="Search for items, categories, or expiry dates...">

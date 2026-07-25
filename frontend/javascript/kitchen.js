@@ -216,3 +216,48 @@ function getStockStatus(quantity) {
     }
     return "";
 }
+
+function filterItems(type, button) {
+
+    document.querySelectorAll(".filter-btn").forEach(btn => {
+        btn.classList.remove("active");
+    });
+
+    button.classList.add("active");
+
+    event.target.classList.add("active");
+
+    let filteredItems = [];
+
+    switch(type){
+
+        case "fresh":
+            filteredItems = items.filter(item =>
+                getExpiryStatus(item.expiryDate).badge === "Fresh"
+            );
+            break;
+
+        case "expiring":
+            filteredItems = items.filter(item =>
+                getExpiryStatus(item.expiryDate).badge === "Expiring Soon"
+            );
+            break;
+
+        case "critical":
+            filteredItems = items.filter(item =>
+                getExpiryStatus(item.expiryDate).badge === "Critical"
+            );
+            break;
+
+        case "expired":
+            filteredItems = items.filter(item =>
+                getExpiryStatus(item.expiryDate).badge === "Expired"
+            );
+            break;
+
+        default:
+            filteredItems = items;
+    }
+
+    displayItems(filteredItems);
+}

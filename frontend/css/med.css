@@ -177,3 +177,155 @@ body {
     font-weight: bold;
     line-height: 1;
 }
+
+.content-area{
+    flex-grow:1;
+    padding:30px;
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+    gap:20px;
+    align-content:start;
+}
+
+.card{
+    background:white;
+    border-radius:12px;
+    padding:20px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.08);
+    position:relative;
+    transition:0.3s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+    box-shadow:0 8px 20px rgba(0,0,0,0.15);
+}
+
+.card h3{
+    color:#1a2b3c;
+    margin-bottom:15px;
+    font-size:22px;
+}
+
+.card p{
+    margin:8px 0;
+    color:#555;
+    font-size:15px;
+}
+
+.status-badge{
+    position:absolute;
+    top:15px;
+    right:15px;
+    padding:6px 12px;
+    border-radius:20px;
+    color:white;
+    font-size:13px;
+    font-weight:bold;
+}
+
+.status-badge.safe{
+    background:#28a745;
+}
+
+.status-badge.warning{
+    background:#ffc107;
+    color:#333;
+}
+
+.status-badge.danger{
+    background:#fd7e14;
+}
+
+.status-badge.expired{
+    background:#dc3545;
+}
+
+.card.safe{
+    border-left:6px solid #28a745;
+}
+
+.card.warning{
+    border-left:6px solid #ffc107;
+}
+
+.card.danger{
+    border-left:6px solid #fd7e14;
+}
+
+.card.expired{
+    border-left:6px solid #dc3545;
+}
+
+.low-stock{
+    margin-top:12px;
+    background:#fff3cd;
+    color:#856404;
+    padding:8px;
+    border-radius:6px;
+    font-weight:bold;
+    text-align:center;
+}
+
+.edit-btn,
+.delete-btn{
+    margin-top:15px;
+    padding:10px 18px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    color:white;
+    font-weight:bold;
+}
+
+.edit-btn{
+    background:#007bff;
+    margin-right:10px;
+}
+
+.edit-btn:hover{
+    background:#0056b3;
+}
+
+.delete-btn{
+    background:#dc3545;
+}
+
+.delete-btn:hover{
+    background:#b02a37;
+}
+
+.filter-item{
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.filter-item:hover{
+    transform:translateX(5px);
+    background:#eef6ff;
+}
+
+.active-filter{
+    border:2px solid #007bff;
+    background:#dbeafe;
+}
+
+/* .active-filter{
+
+    background-color:#0d6efd;
+
+    color:white;
+
+    font-weight:bold;
+
+    border-radius:8px;
+
+    transition:0.3s;
+
+}
+
+.filter-item{
+
+    cursor:pointer;
+
+} */

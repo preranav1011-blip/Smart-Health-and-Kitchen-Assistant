@@ -38,19 +38,19 @@
 
         <div class="card">
             <i class="fa-solid fa-list-check"></i>
-            <h2>12</h2>
+            <h2 id="total-items">0</h2>
             <p>Total Items</p>
         </div>
 
         <div class="card">
             <i class="fa-solid fa-triangle-exclamation"></i>
-            <h2>5</h2>
+            <h2 id="low-stock-items">0</h2>
             <p>Low Stock</p>
         </div>
 
         <div class="card">
             <i class="fa-solid fa-check-circle"></i>
-            <h2>7</h2>
+            <h2 id="purchased-items"></h2>
             <p>Purchased</p>
         </div>
 
@@ -62,64 +62,13 @@
 
         <h2>Items to Buy</h2>
 
-        <div class="item">
-            <input type="checkbox">
-
-            <div class="details">
-                <h3>Milk</h3>
-                <p>Quantity: 2 Litres</p>
-            </div>
-
-            <span class="priority high">High</span>
-        </div>
-
-        <div class="item">
-            <input type="checkbox">
-
-            <div class="details">
-                <h3>Rice</h3>
-                <p>Quantity: 5 Kg</p>
-            </div>
-
-            <span class="priority medium">Medium</span>
-        </div>
-
-        <div class="item">
-            <input type="checkbox">
-
-            <div class="details">
-                <h3>Eggs</h3>
-                <p>Quantity: 12 Pieces</p>
-            </div>
-
-            <span class="priority high">High</span>
-        </div>
-
-        <div class="item">
-            <input type="checkbox">
-
-            <div class="details">
-                <h3>Paracetamol</h3>
-                <p>Quantity: 1 Strip</p>
-            </div>
-
-            <span class="priority low">Low</span>
-        </div>
-
-        <div class="item">
-            <input type="checkbox">
-
-            <div class="details">
-                <h3>Cooking Oil</h3>
-                <p>Quantity: 2 Litres</p>
-            </div>
-
-            <span class="priority medium">Medium</span>
-        </div>
+        <div id="cart-items"></div>
 
     </section>
 
 </main>
+
+<script src="javascript/cart.js"></script>
 
 </body>
 </html>

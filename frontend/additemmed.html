@@ -6,7 +6,6 @@
     <link rel="stylesheet" href="css/additemmed.css">
 </head>
 <body>
-
     <header class="top-navbar">
         <div class="logo">Medicine Inventory</div>
     </header>
@@ -20,16 +19,19 @@
                 Enter the medicine details to keep track of your health inventory.
             </p>
 
-            <form>
+            <form id="medicineForm">
 
                 <div class="input-group">
                     <label>Medicine Name</label>
-                    <input type="text" placeholder="Example: Paracetamol">
+                    <input
+                        type="text"
+                        id="medicineName"
+                        placeholder="Example: Paracetamol">
                 </div>
 
                 <div class="input-group">
                     <label>Medicine Type</label>
-                    <select>
+                    <select id="medicineType">
                         <option>Tablet</option>
                         <option>Capsule</option>
                         <option>Syrup</option>
@@ -42,32 +44,44 @@
 
                 <div class="input-group">
                     <label>Brand Name</label>
-                    <input type="text" placeholder="Example: Dolo 650">
+                    <input 
+                        type="text" 
+                        id="brandName"
+                        placeholder="Example: Dolo 650">
                 </div>
 
                 <div class="input-group">
                     <label>Quantity</label>
-                    <input type="number" placeholder="Enter Quantity">
+                    <input
+                        type="number"
+                        id="quantity"
+                        placeholder="Enter Quantity"
+                        min="1"
+                        step="1"
+                        required>
                 </div>
 
                 <div class="input-group">
                     <label>Dosage</label>
-                    <input type="text" placeholder="Example: 500 mg">
+                    <input 
+                        type="text" 
+                        id="dosage"
+                        placeholder="Example: 500 mg">
                 </div>
 
                 <div class="input-group">
                     <label>Purchase Date</label>
-                    <input type="date">
+                    <input type="date" id="purchaseDate">
                 </div>
 
                 <div class="input-group">
                     <label>Expiry Date</label>
-                    <input type="date">
+                    <input type="date" id="expiryDate">
                 </div>
 
                 <div class="input-group">
                     <label>Storage Location</label>
-                    <select>
+                    <select id="location">
                         <option>Medicine Box</option>
                         <option>Cabinet</option>
                         <option>Refrigerator</option>
@@ -77,7 +91,7 @@
 
                 <div class="input-group">
                     <label>Prescription Required</label>
-                    <select>
+                    <select id="prescription">
                         <option>No</option>
                         <option>Yes</option>
                     </select>
@@ -85,7 +99,13 @@
 
                 <div class="input-group">
                     <label>Low Stock Alert</label>
-                    <input type="number" placeholder="Alert when quantity reaches">
+                    <input
+                        type="number"
+                        id="lowStock"
+                        placeholder="Alert when quantity reaches"
+                        min="1"
+                        step="1"
+                        required>
                 </div>
 
                 <div class="input-group">
@@ -95,11 +115,11 @@
 
                 <div class="input-group">
                     <label>Notes</label>
-                    <textarea placeholder="Any additional information..."></textarea>
+                    <textarea id="notes" placeholder="Any additional information..."></textarea>
                 </div>
 
                 <div class="buttons">
-                    <button class="save-btn">Save Medicine</button>
+                    <button type="submit" class="save-btn">Save Medicine</button>
                     <button class="cancel-btn" type="reset">Cancel</button>
                 </div>
 
@@ -108,6 +128,6 @@
         </div>
 
     </div>
-
+    <script src="javascript/additemmed.js"></script>
 </body>
 </html>
