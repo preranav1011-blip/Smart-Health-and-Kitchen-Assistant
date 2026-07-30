@@ -21,12 +21,7 @@ medicineForm.addEventListener("submit", function(e){
 
     }
 
-    const medicines =
-        JSON.parse(localStorage.getItem("medicines")) || [];
-
     const medicine = {
-
-        id: Date.now(),
 
         medicineName: document.getElementById("medicineName").value,
 
@@ -52,12 +47,31 @@ medicineForm.addEventListener("submit", function(e){
 
     };
 
-    medicines.push(medicine);
+    fetch("http://127.0.0.1:5000/add-medicine", {
 
-    localStorage.setItem("medicines", JSON.stringify(medicines));
+        method: "POST",
 
-    alert("Medicine Saved Successfully");
+        headers: {
+            "Content-Type": "application/json"
+        },
 
-    window.location.href="med.html";
+        body: JSON.stringify(medicine)
+
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        alert(data.message);
+
+        window.location.href = "med.html";
+
+    })
+    .catch(error => {
+
+        console.error(error);
+
+        alert("Failed to save medicine.");
+
+    });     
 
 });

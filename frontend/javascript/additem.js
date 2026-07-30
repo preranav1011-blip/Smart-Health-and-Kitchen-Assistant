@@ -14,15 +14,23 @@ form.addEventListener("submit", function (event) {
         expiryDate: document.getElementById("expiryDate").value
     };
 
-    let items = JSON.parse(localStorage.getItem("inventory")) || [];
+    fetch("http://127.0.0.1:5000/add-item", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(item)
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
 
-    items.push(item);
+        form.reset();
 
-    localStorage.setItem("inventory", JSON.stringify(items));
-
-    alert("Item Added Successfully!");
-
-    form.reset();
-
-    window.location.href = "kit.html";
+        window.location.href = "kit.html";
+    })
+    .catch(error => {
+        console.error(error);
+        alert("Failed to add item.");
+    });
 });

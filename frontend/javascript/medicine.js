@@ -6,10 +6,24 @@ document.getElementById("addMedicineBtn").addEventListener("click", () => {
     window.location.href = "additemmed.html";
 });
 
-let medicines = JSON.parse(localStorage.getItem("medicines")) || [];
+let medicines = [];
 
-displayMedicines();
-updateSummary();
+fetch("http://127.0.0.1:5000/medicines")
+    .then(response => response.json())
+    .then(data => {
+
+        medicines = data;
+
+        displayMedicines();
+
+        updateSummary();
+
+    })
+    .catch(error => {
+
+        console.error(error);
+
+    });
 
 function displayMedicines(data = medicines){
 
@@ -82,13 +96,30 @@ function deleteMedicine(id){
 
     if(confirm("Delete this medicine?")){
 
-        medicines = medicines.filter(medicine=>medicine.id!==id);
+        fetch(`http://127.0.0.1:5000/delete-medicine/${id}`,{
 
-        localStorage.setItem("medicines",JSON.stringify(medicines));
+            method:"DELETE"
 
-        displayMedicines();
+        })
+        .then(response=>response.json())
+        .then(data=>{
 
-        updateSummary();
+            alert(data.message);
+
+            medicines = medicines.filter(medicine=>medicine.id!==id);
+
+            displayMedicines();
+
+            updateSummary();
+
+        })
+        .catch(error=>{
+
+            console.error(error);
+
+            alert("Failed to delete medicine.");
+
+        });
 
     }
 
@@ -106,6 +137,12 @@ function editMedicine(id){
         alert("Medicine name cannot be empty.");
         return;
     }
+
+    let newType = prompt("Medicine Type", medicine.medicineType);
+    if (newType === null) return;
+
+    let newPurchase = prompt("Purchase Date (YYYY-MM-DD)", medicine.purchaseDate);
+    if (newPurchase === null) return;
 
     let newBrand = prompt("Brand Name", medicine.brandName);
     if(newBrand === null) return;
@@ -161,28 +198,45 @@ function editMedicine(id){
     if(newNotes === null) return;
 
     medicine.medicineName = newName.trim();
-
+    medicine.medicineType = newType.trim();
+    medicine.purchaseDate = newPurchase;
     medicine.brandName = newBrand.trim();
-
     medicine.dosage = newDosage.trim();
-
-    medicine.quantity = newQuantity;
-
+    medicine.quantity = Number(newQuantity);
     medicine.expiryDate = newExpiry;
-
     medicine.location = newLocation;
-
-    medicine.lowStock = newLowStock;
-
+    medicine.lowStock = Number(newLowStock);
     medicine.prescription = newPrescription;
-
     medicine.notes = newNotes.trim();
 
-    localStorage.setItem("medicines", JSON.stringify(medicines));
+    fetch(`http://127.0.0.1:5000/update-medicine/${id}`, {
 
-    displayMedicines();
+        method: "PUT",
 
-    updateSummary();
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify(medicine)
+
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        alert(data.message);
+
+        displayMedicines();
+
+        updateSummary();
+
+    })
+    .catch(error => {
+
+        console.error(error);
+
+        alert("Failed to update medicine.");
+
+    });
 
 }
 
@@ -271,11 +325,12 @@ function getExpiryStatus(expiryDate) {
     }
 }
 
-function getStockStatus(quantity) {
+function getStockStatus(quantity, lowStock){
 
     quantity = Number(quantity);
+    lowStock = Number(lowStock);
 
-    if (quantity <= 5) {
+    if(quantity <= lowStock){
         return "Low Stock";
     }
 
@@ -287,7 +342,7 @@ function updateSummary(){
     document.getElementById("total-skus").textContent = medicines.length;
 
     const lowStock = medicines.filter(medicine =>
-        Number(medicine.quantity) <= 5
+        Number(medicine.quantity) <= Number(medicine.lowStock)
     ).length;
 
     document.getElementById("low-stock").textContent = lowStock;
@@ -340,7 +395,7 @@ function filterMedicines(type, element){
         case "lowstock":
 
             filtered = medicines.filter(medicine =>
-                Number(medicine.quantity) <= 5
+                Number(medicine.quantity) <= Number(medicine.low)
             );
 
             break;

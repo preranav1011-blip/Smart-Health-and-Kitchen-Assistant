@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Smart Health and Kitchen Assistant</title>
+        <link rel = "icon" href = "images/Gemini_Generated_Image_7rve5h7rve5h7rve.png">
+        <link rel="stylesheet" href="css/home.css">
+    </head>
+<body>
+
+    <!-- Sidebar Menu -->
+    <img src="images/threelines.png" id="menuToggle" alt="Menu Toggle">
+    <nav class="options" id="sidebar">
+        <a href="home.html" class="home active">Home</a>
+
+        <div class="menu-group">
+            <a href="#" class="inventory">Inventory</a>
+            <div class="sub-menu">
+                <a href="kit.html" class="food">Food</a>
+                <a href="med.html" class="meds">Medicines</a>
+            </div>
+        </div>
+
+        <a href="recipes.html" class="recipe">Recipes</a>
+        <a href="yourcart.html" class="cart">Your Cart</a>
+        <a href="notif.html" class="notifs">Notifications</a>
+        <a href="#" class="insights">Insights</a>
+        <a href="settings.html" class="sets">Settings</a>
+        <a href="#" class="help">Help</a>
+        <a href="#" class="logout">Log Out</a>
+    </nav>
+
+    <!-- Main Content Layout -->
+    <div class="main-content">
+        <!-- Top Header Block -->
+        <header class="top-header">
+            <div class="welcome-section">
+                <img src="images/user-circles-set_78370-4704.avif" alt="Profile" class="profile-image">
+                <div>
+                    <h1>Welcome Back!</h1>
+                    <p class="subtitle">Here is an overview of your Household & Health inventory</p>
+                </div>
+            </div>
+
+            <div class="search-container">
+                <input type="text" id="global-search" placeholder="Search kitchen items, medicines, or categories...">
+                <button type="button" class="search-btn">Search</button>
+            </div>
+        </header>
+
+        <!-- Quick Actions & Alerts Section -->
+        <section class="alerts-banner">
+            <div class="alert-card critical">
+                <span class="alert-icon">⚠️</span>
+                <div>
+                    <strong>Critical Items</strong>
+                    <p><span id="total-critical-count">3</span> items require immediate attention (expired or &le; 2 days left)</p>
+                </div>
+            </div>
+            <div class="alert-card low-stock">
+                <span class="alert-icon">🛒</span>
+                <div>
+                    <strong>Low Stock Warning</strong>
+                    <p><span id="total-low-stock-count">5</span> items are running low and need restocking</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Overview Metric Cards -->
+        <section class="dashboard-grid">
+            
+            <!-- Kitchen Overview Card -->
+            <div class="dashboard-card kitchen-card">
+                <div class="card-header">
+                    <h2>Kitchen Inventory</h2>
+                    <a href="kit.html" class="view-all-link">View Full Kitchen &rarr;</a>
+                </div>
+                
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <span class="stat-num" id="kit-total">0</span>
+                        <span class="stat-label">Total Items</span>
+                    </div>
+                    <div class="stat-box warning">
+                        <span class="stat-num" id="kit-expiring">0</span>
+                        <span class="stat-label">Expiring Soon</span>
+                    </div>
+                    <div class="stat-box danger">
+                        <span class="stat-num" id="kit-expired">0</span>
+                        <span class="stat-label">Expired</span>
+                    </div>
+                </div>
+
+                <div class="recent-list-container">
+                    <h3>Recent Kitchen Activity</h3>
+                    <ul class="item-preview-list" id="kitchen-preview">
+                        <li class="preview-item">
+                            <span>Whole Milk (1L)</span>
+                            <span class="tag warning">Expires in 2 days</span>
+                        </li>
+                        <li class="preview-item">
+                            <span>Fresh Spinach</span>
+                            <span class="tag danger">Expired yesterday</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Medicine Overview Card -->
+            <div class="dashboard-card health-card">
+                <div class="card-header">
+                    <h2><span class="med-icon">✚</span> Medicine Inventory</h2>
+                    <a href="med.html" class="view-all-link">View All Meds &rarr;</a>
+                </div>
+
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <span class="stat-num" id="med-total-skus">0</span>
+                        <span class="stat-label">Total SKUs</span>
+                    </div>
+                    <div class="stat-box warning">
+                        <span class="stat-num" id="med-low-stock">0</span>
+                        <span class="stat-label">Low Stock</span>
+                    </div>
+                    <div class="stat-box danger">
+                        <span class="stat-num" id="med-critical">0</span>
+                        <span class="stat-label">Critical (&le;2 Days)</span>
+                    </div>
+                </div>
+
+                <div class="recent-list-container">
+                    <h3>Recent Medicine Alerts</h3>
+                    <ul class="item-preview-list" id="medicine-preview">
+                        <li class="preview-item">
+                            <span>Paracetamol 500mg</span>
+                            <span class="tag safe">Safe (In Stock)</span>
+                        </li>
+                        <li class="preview-item">
+                            <span>Amoxicillin</span>
+                            <span class="tag danger">2 Days Remaining</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Suggested Additions Section -->
+        <section class="insights-section">
+            <h2>Recommended Features & Insights</h2>
+            <div class="suggestions-grid">
+                <div class="suggestion-card">
+                    <h3>🍳 Quick Meal Suggestions</h3>
+                    <p>Based on ingredients about to expire in your kitchen (e.g., Milk & Spinach), you can make a <strong>Creamy Spinach Pasta</strong> today.</p>
+                    <a href="recipes.html" class="action-btn">View Recipes</a>
+                </div>
+
+                <div class="suggestion-card">
+                    <h3>📋 Auto-Generated Shopping List</h3>
+                    <p>You have 5 low-stock items across Kitchen and Health. Add them directly to your cart with one click.</p>
+                    <a href="yourcart.html" class="action-btn">Open Shopping Cart</a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Floating Action Buttons -->
+    <div class="floating-actions">
+        <a href="additem.html" class="add-item-btn kit-btn" title="Add Kitchen Item">+ Kitchen Item</a>
+        <button class="add-item-btn med-btn" id="addMedicineBtn" title="Log New Medicine Batch">+ Log Medicine</button>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Sidebar Toggle Script
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+    </script>
+    <script src="javascript/home-dashboard.js"></script>
+</body>
+</html>

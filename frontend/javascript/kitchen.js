@@ -2,10 +2,29 @@ const contentArea = document.querySelector(".content-area");
 const searchInput = document.getElementById("search");
 const searchBtn = document.querySelector(".search-btn");
 
-let items = JSON.parse(localStorage.getItem("inventory")) || [];
+let items = [];
 
-displayItems();
-updateSummary();
+loadItems();
+
+async function loadItems() {
+
+    try {
+
+        const response = await fetch("http://127.0.0.1:5000/items");
+
+        items = await response.json();
+
+        displayItems();
+
+        updateSummary();
+
+    } catch(error){
+
+        console.error(error);
+
+        alert("Unable to load items.");
+    }
+}
 
 function displayItems(data = items) {
 
@@ -67,38 +86,75 @@ function displayItems(data = items) {
     document.getElementById("expired-items").textContent = expiredCount;
 }
 
-function deleteItem(id) {
+async function deleteItem(id) {
 
-    if (confirm("Delete this item?")) {
+    if (!confirm("Delete this item?")) {
+        return;
+    }
 
-        items = items.filter(item => item.id !== id);
+    try {
 
-        localStorage.setItem("inventory", JSON.stringify(items));
+        const response = await fetch(
+            `http://127.0.0.1:5000/delete-item/${id}`,
+            {
+                method: "DELETE"
+            }
+        );
 
-        displayItems();
-        updateSummary();
+        const data = await response.json();
+
+        alert(data.message);
+
+        loadItems();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Failed to delete item.");
     }
 }
 
-function editItem(id) {
+async function editItem(id) {
 
-    let item = items.find(item => item.id === id);
+    const item = items.find(item => item.id === id);
 
-    let newName = prompt("Enter Item Name", item.name);
+    const newName = prompt("Enter Item Name", item.name);
 
     if (newName === null) return;
 
-    let newQuantity = prompt("Enter Quantity", item.quantity);
+    const newQuantity = prompt("Enter Quantity", item.quantity);
 
     if (newQuantity === null) return;
 
-    item.name = newName;
-    item.quantity = newQuantity;
+    try {
 
-    localStorage.setItem("inventory", JSON.stringify(items));
+        const response = await fetch(
+            `http://127.0.0.1:5000/update-item/${id}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name: newName,
+                    quantity: newQuantity
+                })
+            }
+        );
 
-    displayItems();
-    updateSummary();
+        const data = await response.json();
+
+        alert(data.message);
+
+        loadItems();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Failed to update item.");
+    }
 }
 
 searchBtn.addEventListener("click", function () {
