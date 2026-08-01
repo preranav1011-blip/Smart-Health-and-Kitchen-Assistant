@@ -1,6 +1,16 @@
 const cartContainer = document.getElementById("cart-items");
 let purchasedCount = 0;
 
+document.addEventListener("DOMContentLoaded", () => {
+
+    const userId = localStorage.getItem("user_id");
+
+    if (!userId) {
+        window.location.href = "login.html";
+    }
+
+});
+
 async function loadCart() {
 
     try {

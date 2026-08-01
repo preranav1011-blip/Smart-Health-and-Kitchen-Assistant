@@ -1,5 +1,15 @@
 const API_URL = "http://127.0.0.1:5000";
 
+document.addEventListener("DOMContentLoaded", () => {
+
+    const userId = localStorage.getItem("user_id");
+
+    if (!userId) {
+        window.location.href = "login.html";
+    }
+
+});
+
 window.addEventListener("DOMContentLoaded", () => {
     loadKitchenData();
     loadMedicineData();
@@ -11,7 +21,11 @@ window.addEventListener("DOMContentLoaded", () => {
 
 async function loadKitchenData() {
     try {
-        const response = await fetch(`${API_URL}/items`);
+        const userId = localStorage.getItem("user_id");
+
+        const response = await fetch(
+            `${API_URL}/items?user_id=${userId}`
+        );
         const items = await response.json();
 
         document.getElementById("kit-total").textContent = items.length;
@@ -89,7 +103,11 @@ async function loadMedicineData(){
 
     try{
 
-        const response = await fetch(`${API_URL}/medicines`);
+        const userId = localStorage.getItem("user_id");
+
+        const response = await fetch(
+            `${API_URL}/medicines?user_id=${userId}`
+        );
         const medicines = await response.json();
 
         document.getElementById("med-total-skus").textContent = medicines.length;
@@ -177,3 +195,7 @@ function updateGlobalCounts(low,critical){
     document.getElementById("total-critical-count").textContent=
         kitchenCritical+medicineCritical;
 }
+
+document.getElementById("addMedicineBtn").addEventListener("click", () => {
+    window.location.href = "additemmed.html";
+});

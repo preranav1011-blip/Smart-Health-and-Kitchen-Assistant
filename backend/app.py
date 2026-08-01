@@ -31,11 +31,16 @@ def home():
 @app.route("/items")
 def get_items():
 
+    user_id = request.args.get("user_id")
+
     conn = sqlite3.connect("database.db")
     conn.row_factory = sqlite3.Row
 
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM kitchen_items")
+    cursor.execute(
+        "SELECT * FROM kitchen_items WHERE user_id = ?",
+        (user_id,)
+    )
 
     rows = cursor.fetchall()
     conn.close()
@@ -65,9 +70,10 @@ def add_item():
 
     cursor.execute("""
         INSERT INTO kitchen_items
-        (name, category, quantity, unit, purchase_date, expiry_date)
-        VALUES (?, ?, ?, ?, ?, ?)
+        (user_id, name, category, quantity, unit, purchase_date, expiry_date)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     """, (
+        data["user_id"],
         data["name"],
         data["category"],
         data["quantity"],
@@ -129,11 +135,16 @@ def update_item(item_id):
 @app.route("/medicines")
 def get_medicines():
 
+    user_id = request.args.get("user_id")
+
     conn = sqlite3.connect("database.db")
     conn.row_factory = sqlite3.Row
 
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM medicines")
+    cursor.execute(
+        "SELECT * FROM medicines WHERE user_id = ?",
+        (user_id,)
+    )
 
     rows = cursor.fetchall()
     conn.close()
@@ -172,6 +183,7 @@ def add_medicine():
     cursor.execute("""
         INSERT INTO medicines
         (
+            user_id,
             medicineName,
             medicineType,
             brandName,
@@ -184,9 +196,10 @@ def add_medicine():
             lowStock,
             notes
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
 
+        data["user_id"],
         data["medicineName"],
         data["medicineType"],
         data["brandName"],
@@ -198,7 +211,6 @@ def add_medicine():
         data["prescription"],
         data["lowStock"],
         data["notes"]
-
     ))
 
     conn.commit()
@@ -342,6 +354,7 @@ def login():
     password = data["password"]
 
     conn = sqlite3.connect("database.db")
+    conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
     cursor.execute(
@@ -358,7 +371,9 @@ def login():
 
     if user:
         return jsonify({
-            "message": "Login successful"
+            "message": "Login successful",
+            "user_id": user["id"],
+            "name": user["name"]
         })
     else:
         return jsonify({

@@ -2,13 +2,25 @@ const contentArea = document.querySelector(".content-area");
 const searchInput = document.getElementById("search");
 const searchBtn = document.querySelector(".search-btn");
 
+document.addEventListener("DOMContentLoaded", () => {
+
+    const userId = localStorage.getItem("user_id");
+
+    if (!userId) {
+        window.location.href = "login.html";
+    }
+
+});
+
 document.getElementById("addMedicineBtn").addEventListener("click", () => {
     window.location.href = "additemmed.html";
 });
 
 let medicines = [];
 
-fetch("http://127.0.0.1:5000/medicines")
+const userId = localStorage.getItem("user_id");
+
+fetch(`http://127.0.0.1:5000/medicines?user_id=${userId}`)
     .then(response => response.json())
     .then(data => {
 
@@ -395,7 +407,7 @@ function filterMedicines(type, element){
         case "lowstock":
 
             filtered = medicines.filter(medicine =>
-                Number(medicine.quantity) <= Number(medicine.low)
+                Number(medicine.quantity) <= Number(medicine.lowStock)
             );
 
             break;

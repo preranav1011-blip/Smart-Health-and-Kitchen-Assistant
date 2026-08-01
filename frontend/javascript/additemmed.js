@@ -2,6 +2,16 @@ const medicineForm = document.getElementById("medicineForm");
 
 const today = new Date().toISOString().split("T")[0];
 
+document.addEventListener("DOMContentLoaded", () => {
+
+    const userId = localStorage.getItem("user_id");
+
+    if (!userId) {
+        window.location.href = "login.html";
+    }
+
+});
+
 document.getElementById("expiryDate").min = today;
 
 document.getElementById("purchaseDate").max = today;
@@ -22,6 +32,8 @@ medicineForm.addEventListener("submit", function(e){
     }
 
     const medicine = {
+
+        user_id: localStorage.getItem("user_id"),
 
         medicineName: document.getElementById("medicineName").value,
 

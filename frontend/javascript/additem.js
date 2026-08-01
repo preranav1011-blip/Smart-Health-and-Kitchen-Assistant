@@ -1,11 +1,21 @@
 const form = document.getElementById("addItemForm");
 
+document.addEventListener("DOMContentLoaded", () => {
+
+    const userId = localStorage.getItem("user_id");
+
+    if (!userId) {
+        window.location.href = "login.html";
+    }
+
+});
+
 form.addEventListener("submit", function (event) {
 
     event.preventDefault();
 
     const item = {
-        id: Date.now(),
+        user_id: localStorage.getItem("user_id"),
         name: document.getElementById("itemName").value,
         category: document.getElementById("category").value,
         quantity: document.getElementById("quantity").value,

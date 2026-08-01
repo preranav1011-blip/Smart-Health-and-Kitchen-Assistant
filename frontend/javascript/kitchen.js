@@ -2,6 +2,16 @@ const contentArea = document.querySelector(".content-area");
 const searchInput = document.getElementById("search");
 const searchBtn = document.querySelector(".search-btn");
 
+document.addEventListener("DOMContentLoaded", () => {
+
+    const userId = localStorage.getItem("user_id");
+
+    if (!userId) {
+        window.location.href = "login.html";
+    }
+
+});
+
 let items = [];
 
 loadItems();
@@ -10,8 +20,11 @@ async function loadItems() {
 
     try {
 
-        const response = await fetch("http://127.0.0.1:5000/items");
+        const userId = localStorage.getItem("user_id");
 
+        const response = await fetch(
+            `http://127.0.0.1:5000/items?user_id=${userId}`
+        );
         items = await response.json();
 
         displayItems();
