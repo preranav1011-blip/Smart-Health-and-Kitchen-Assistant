@@ -11,7 +11,7 @@ document.getElementById("loginForm").addEventListener("submit", async function (
 
     try {
 
-        const response = await fetch("http://127.0.0.1:5000/login", {
+        const response = await fetch("http://https://smart-health-and-kitchen-assistant.onrender.com/login", {
 
             method: "POST",
 

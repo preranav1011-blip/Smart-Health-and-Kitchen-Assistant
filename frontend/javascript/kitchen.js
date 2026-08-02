@@ -23,7 +23,7 @@ async function loadItems() {
         const userId = localStorage.getItem("user_id");
 
         const response = await fetch(
-            `http://127.0.0.1:5000/items?user_id=${userId}`
+            `http://https://smart-health-and-kitchen-assistant.onrender.com/items?user_id=${userId}`
         );
         items = await response.json();
 
@@ -108,7 +108,7 @@ async function deleteItem(id) {
     try {
 
         const response = await fetch(
-            `http://127.0.0.1:5000/delete-item/${id}`,
+            `http://https://smart-health-and-kitchen-assistant.onrender.com/delete-item/${id}`,
             {
                 method: "DELETE"
             }
@@ -143,7 +143,7 @@ async function editItem(id) {
     try {
 
         const response = await fetch(
-            `http://127.0.0.1:5000/update-item/${id}`,
+            `http://https://smart-health-and-kitchen-assistant.onrender.com/update-item/${id}`,
             {
                 method: "PUT",
                 headers: {

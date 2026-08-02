@@ -20,7 +20,7 @@ let medicines = [];
 
 const userId = localStorage.getItem("user_id");
 
-fetch(`http://127.0.0.1:5000/medicines?user_id=${userId}`)
+fetch(`http://https://smart-health-and-kitchen-assistant.onrender.com/medicines?user_id=${userId}`)
     .then(response => response.json())
     .then(data => {
 
@@ -108,7 +108,7 @@ function deleteMedicine(id){
 
     if(confirm("Delete this medicine?")){
 
-        fetch(`http://127.0.0.1:5000/delete-medicine/${id}`,{
+        fetch(`http://https://smart-health-and-kitchen-assistant.onrender.com/delete-medicine/${id}`,{
 
             method:"DELETE"
 
@@ -221,7 +221,7 @@ function editMedicine(id){
     medicine.prescription = newPrescription;
     medicine.notes = newNotes.trim();
 
-    fetch(`http://127.0.0.1:5000/update-medicine/${id}`, {
+    fetch(`http://https://smart-health-and-kitchen-assistant.onrender.com/update-medicine/${id}`, {
 
         method: "PUT",
 
