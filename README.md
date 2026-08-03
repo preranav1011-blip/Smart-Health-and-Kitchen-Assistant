@@ -85,4 +85,4 @@ project/
 
 ## Author
 
-Developed by Visala.
+Developed by Prerana.
