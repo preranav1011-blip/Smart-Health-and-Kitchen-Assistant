@@ -1,4 +1,4 @@
-const API_URL = "http://https://smart-health-and-kitchen-assistant.onrender.com";
+const API_URL = "https://smart-health-and-kitchen-assistant.onrender.com";
 
 document.addEventListener("DOMContentLoaded", () => {
 

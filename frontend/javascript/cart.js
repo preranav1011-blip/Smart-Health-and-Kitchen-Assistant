@@ -16,8 +16,8 @@ async function loadCart() {
     try {
 
         const [kitchenResponse, medicineResponse] = await Promise.all([
-            fetch("http://https://smart-health-and-kitchen-assistant.onrender.com/items"),
-            fetch("http://https://smart-health-and-kitchen-assistant.onrender.com/medicines")
+            fetch("https://smart-health-and-kitchen-assistant.onrender.com/items"),
+            fetch("https://smart-health-and-kitchen-assistant.onrender.com/medicines")
         ]);
 
         const kitchenItems = await kitchenResponse.json();

@@ -59,7 +59,7 @@ medicineForm.addEventListener("submit", function(e){
 
     };
 
-    fetch("http://https://smart-health-and-kitchen-assistant.onrender.com/add-medicine", {
+    fetch("https://smart-health-and-kitchen-assistant.onrender.com/add-medicine", {
 
         method: "POST",
 

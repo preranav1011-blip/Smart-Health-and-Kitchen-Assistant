@@ -24,7 +24,7 @@ form.addEventListener("submit", function (event) {
         expiryDate: document.getElementById("expiryDate").value
     };
 
-    fetch("http://https://smart-health-and-kitchen-assistant.onrender.com/add-item", {
+    fetch("https://smart-health-and-kitchen-assistant.onrender.com/add-item", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
