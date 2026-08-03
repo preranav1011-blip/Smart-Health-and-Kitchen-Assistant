@@ -78,9 +78,9 @@ project/
 ## Future Improvements
 
 - Email notifications
-- Barcode scanning
 - Recipe recommendations
 - Shopping list generation
+- Barcode scanning
 - Mobile application
 
 ## Author
