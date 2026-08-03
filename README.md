@@ -42,7 +42,7 @@ A web application that helps users manage kitchen inventory and medicine stock i
 
 1. Clone the repository
    ```bash
-   git clone <repository-url>
+   git clone <https://github.com/preranav1011-blip/Smart-Health-and-Food-Assistant>
    ```
 
 2. Install dependencies
