@@ -2,6 +2,10 @@
 
 A web application that helps users manage kitchen inventory and medicine stock in one place. It tracks expiry dates, monitors low stock, and helps users stay organized.
 
+## Live Demo
+
+🌐 **Application:** https://smart-health-and-kitchen-assistant-1mfq.onrender.com
+
 ## Features
 
 ### User Authentication
