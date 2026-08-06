@@ -12,12 +12,13 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function loadCart() {
+    const userId = localStorage.getItem("user_id");
 
     try {
 
         const [kitchenResponse, medicineResponse] = await Promise.all([
-            fetch("https://smart-health-and-kitchen-assistant.onrender.com/items"),
-            fetch("https://smart-health-and-kitchen-assistant.onrender.com/medicines")
+            fetch(`https://smart-health-and-kitchen-assistant.onrender.com/items?user_id=${userId}`),
+            fetch(`https://smart-health-and-kitchen-assistant.onrender.com/medicines?user_id=${userId}`)
         ]);
 
         const kitchenItems = await kitchenResponse.json();
