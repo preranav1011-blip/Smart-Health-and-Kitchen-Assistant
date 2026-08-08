@@ -12,9 +12,10 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function loadCart() {
-    const userId = localStorage.getItem("user_id");
 
     try {
+
+        const userId = localStorage.getItem("user_id");
 
         const [kitchenResponse, medicineResponse] = await Promise.all([
             fetch(`https://smart-health-and-kitchen-assistant.onrender.com/items?user_id=${userId}`),
@@ -28,8 +29,9 @@ async function loadCart() {
         const kitchenLowStock = kitchenItems
             .filter(item => Number(item.quantity) <= 2)
             .map(item => ({
+                id: item.id,
                 name: item.name,
-                quantity: item.quantity,
+                quantity: Number(item.quantity),
                 unit: item.unit,
                 type: "Kitchen"
             }));
@@ -38,10 +40,23 @@ async function loadCart() {
         const medicineLowStock = medicineItems
             .filter(item => Number(item.quantity) <= Number(item.lowStock))
             .map(item => ({
+                id: item.id,
                 name: item.medicineName,
-                quantity: item.quantity,
+                quantity: Number(item.quantity),
                 unit: "pcs",
-                type: "Medicine"
+                type: "Medicine",
+
+                // Keep the complete medicine information
+                // because the backend update route expects it.
+                medicineType: item.medicineType,
+                brandName: item.brandName,
+                dosage: item.dosage,
+                purchaseDate: item.purchaseDate,
+                expiryDate: item.expiryDate,
+                location: item.location,
+                prescription: item.prescription,
+                lowStock: item.lowStock,
+                notes: item.notes
             }));
 
         const cartItems = [...kitchenLowStock, ...medicineLowStock];
@@ -58,13 +73,13 @@ async function loadCart() {
 
         } else {
 
+            let html = "";
+
             cartItems.forEach(item => {
 
-                cartContainer.innerHTML += `
+                html += `
 
                     <div class="item">
-
-                        <input type="checkbox" class="purchase-check">
 
                         <div class="details">
 
@@ -82,19 +97,25 @@ async function loadCart() {
                             Low Stock
                         </span>
 
+                        <button
+                            class="purchase-btn"
+                            onclick='purchaseItem(${JSON.stringify(item)})'>
+                            ✓ Purchased
+                        </button>
+
                     </div>
 
                 `;
 
             });
 
+            cartContainer.innerHTML = html;
+
         }
 
         document.getElementById("total-items").textContent = cartItems.length;
         document.getElementById("low-stock-items").textContent = cartItems.length;
         document.getElementById("purchased-items").textContent = purchasedCount;
-
-        setupCheckboxes();
 
     }
 
@@ -109,25 +130,131 @@ async function loadCart() {
 
 }
 
-function setupCheckboxes() {
 
-    document.querySelectorAll(".purchase-check").forEach(box => {
+// ------------------------------------------
+// PURCHASE ITEM
+// ------------------------------------------
 
-        box.addEventListener("change", function () {
+async function purchaseItem(item) {
 
-            if (this.checked) {
-                purchasedCount++;
-                this.closest(".item").classList.add("completed");
-            } else {
-                purchasedCount--;
-                this.closest(".item").classList.remove("completed");
-            }
+    const purchasedQuantity = prompt(
+        `How many ${item.name} did you buy?`,
+        "1"
+    );
 
-            document.getElementById("purchased-items").textContent = purchasedCount;
+    // User pressed Cancel
+    if (purchasedQuantity === null) {
+        return;
+    }
 
-        });
+    const amount = Number(purchasedQuantity);
 
-    });
+    // Validate quantity
+    if (
+        purchasedQuantity.trim() === "" ||
+        !Number.isInteger(amount) ||
+        amount <= 0
+    ) {
+
+        alert("Please enter a valid positive whole number.");
+
+        return;
+    }
+
+    const newQuantity = item.quantity + amount;
+
+    try {
+
+        let response;
+
+        // ------------------------------------------
+        // KITCHEN ITEM
+        // ------------------------------------------
+
+        if (item.type === "Kitchen") {
+
+            response = await fetch(
+                `https://smart-health-and-kitchen-assistant.onrender.com/update-item/${item.id}`,
+                {
+                    method: "PUT",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        name: item.name,
+                        quantity: newQuantity
+                    })
+                }
+            );
+
+        }
+
+        // ------------------------------------------
+        // MEDICINE
+        // ------------------------------------------
+
+        else if (item.type === "Medicine") {
+
+            response = await fetch(
+                `https://smart-health-and-kitchen-assistant.onrender.com/update-medicine/${item.id}`,
+                {
+                    method: "PUT",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        medicineName: item.name,
+                        medicineType: item.medicineType,
+                        brandName: item.brandName,
+                        quantity: newQuantity,
+                        dosage: item.dosage,
+                        purchaseDate: item.purchaseDate,
+                        expiryDate: item.expiryDate,
+                        location: item.location,
+                        prescription: item.prescription,
+                        lowStock: item.lowStock,
+                        notes: item.notes
+
+                    })
+                }
+            );
+
+        }
+
+        const data = await response.json();
+
+        if (!response.ok) {
+
+            alert(data.message || "Failed to update quantity.");
+
+            return;
+        }
+
+        // Successfully purchased
+        purchasedCount++;
+
+        alert(
+            `${amount} ${item.name} added to your inventory.\n\n` +
+            `New quantity: ${newQuantity}`
+        );
+
+        // Reload cart
+        loadCart();
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        alert("Failed to update inventory.");
+
+    }
 
 }
 
