@@ -94,3 +94,75 @@ def test_dashboard_summary_and_charts(client, test_user):
     assert "inventory_breakdown" in data["charts"]
     assert "expiry_health" in data["charts"]
     assert "kitchen_categories" in data["charts"]
+
+
+def test_ai_recipe_generator_and_agent(client, test_user):
+    # Add items to user's kitchen
+    client.post("/api/items", json={
+        "user_id": test_user["id"],
+        "name": "Chicken Breast",
+        "quantity": 2
+    })
+    client.post("/api/items", json={
+        "user_id": test_user["id"],
+        "name": "Bell Pepper",
+        "quantity": 3
+    })
+
+    # Test auto-generation with all items
+    resp = client.post("/api/recipes/ai-generate", json={
+        "user_id": test_user["id"],
+        "preference": "High Protein",
+        "meal_type": "Dinner"
+    })
+    assert resp.status_code == 201
+    data = resp.get_json()
+    assert data["success"] is True
+    recipe = data["recipe"]
+    assert "High-Protein" in recipe["title"] or "Chicken" in recipe["title"] or len(recipe["instructions"]) > 0
+    assert "chefTip" in recipe
+    assert "nutrition" in recipe
+
+    # Test generation with custom selected ingredients
+    resp2 = client.post("/api/recipes/ai-generate", json={
+        "user_id": test_user["id"],
+        "ingredients": ["Eggs", "Spinach", "Cheese"],
+        "preference": "Quick & Easy",
+        "meal_type": "Breakfast"
+    })
+    assert resp2.status_code == 201
+    recipe2 = resp2.get_json()["recipe"]
+    assert len(recipe2["ingredients"]) == 3
+    assert "Breakfast" in recipe2["category"]
+
+
+def test_medicine_schedule_alarm_and_take(client, test_user):
+    # Create medicine with alarm time
+    med_resp = client.post("/api/medicines", json={
+        "user_id": test_user["id"],
+        "medicineName": "Metformin",
+        "dosage": "500 mg",
+        "quantity": 10,
+        "reminderTime": "08:30",
+        "frequency": "Twice Daily",
+        "isAlarmActive": True
+    })
+    assert med_resp.status_code == 201
+    med_id = med_resp.get_json()["data"]["id"]
+
+    # Verify notification service lists medicine alarm
+    alerts_resp = client.get(f"/api/notifications/alerts?user_id={test_user['id']}")
+    assert alerts_resp.status_code == 200
+    alerts = alerts_resp.get_json()["alerts"]
+    assert alerts["summary"]["medicine_alarm_count"] >= 1
+    alarm = next(a for a in alerts["medicine_alarms"] if a["id"] == med_id)
+    assert alarm["reminderTime"] == "08:30"
+    assert alarm["name"] == "Metformin"
+
+    # Take medicine dose
+    take_resp = client.post(f"/api/medicines/{med_id}/take")
+    assert take_resp.status_code == 200
+    take_data = take_resp.get_json()
+    assert take_data["success"] is True
+    assert take_data["data"]["quantity"] == 9  # Decremented by 1
+    assert take_data["data"]["lastTaken"] != ""

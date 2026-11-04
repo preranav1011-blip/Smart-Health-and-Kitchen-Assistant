@@ -1,0 +1,225 @@
+/* ========================================================
+   Universal Navigation Drawer & Menu Styles
+   Smart Health & Kitchen Assistant
+   ======================================================== */
+
+/* Fixed Hamburger Trigger Button */
+.universal-menu-toggle {
+    position: fixed;
+    top: 14px;
+    left: 16px;
+    z-index: 9990;
+    width: 44px;
+    height: 44px;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.universal-menu-toggle:hover {
+    transform: scale(1.05);
+    background: #f7fafc;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
+}
+
+.universal-menu-toggle span {
+    display: block;
+    width: 22px;
+    height: 3px;
+    background: #2d3748;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+/* Semi-transparent Backdrop Overlay */
+.universal-nav-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(2px);
+    z-index: 9998;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.universal-nav-backdrop.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Slide-out Navigation Drawer */
+.universal-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 290px;
+    max-width: 85vw;
+    height: 100vh;
+    background: #ffffff;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.18);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(-100%);
+    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    overflow-y: auto;
+}
+
+.universal-drawer.open {
+    transform: translateX(0);
+}
+
+/* Drawer Header */
+.drawer-header {
+    padding: 22px 20px;
+    background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.drawer-header .brand-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.drawer-header .brand-logo {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: white;
+    padding: 2px;
+}
+
+.drawer-header .brand-name {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    margin: 0;
+}
+
+.drawer-header .user-greeting {
+    font-size: 12px;
+    opacity: 0.88;
+    margin: 2px 0 0 0;
+}
+
+.drawer-close-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    font-size: 20px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.drawer-close-btn:hover {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+/* Drawer Links */
+.drawer-nav {
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.drawer-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #94a3b8;
+    letter-spacing: 0.6px;
+    margin: 14px 12px 6px 12px;
+}
+
+.drawer-link {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 11px 14px;
+    color: #334155;
+    text-decoration: none;
+    font-size: 14.5px;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.18s ease;
+}
+
+.drawer-link:hover {
+    background: #f1f5f9;
+    color: #1e293b;
+    transform: translateX(3px);
+}
+
+.drawer-link.active {
+    background: #e8f5e9;
+    color: #2e7d32;
+    font-weight: 600;
+}
+
+.drawer-link .link-icon {
+    font-size: 18px;
+    width: 24px;
+    text-align: center;
+}
+
+.drawer-badge {
+    margin-left: auto;
+    background: #ef4444;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+.drawer-footer {
+    padding: 16px;
+    border-top: 1px solid #f1f5f9;
+    background: #fafafa;
+}
+
+.drawer-logout-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    background: #fff1f2;
+    color: #e11d48;
+    border: 1px solid #ffe4e6;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.drawer-logout-btn:hover {
+    background: #ffe4e6;
+}

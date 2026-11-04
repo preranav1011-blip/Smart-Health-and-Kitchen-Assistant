@@ -24,10 +24,12 @@ class NotificationService:
             "expired_items": [],
             "expiring_soon_items": [],
             "low_stock_items": [],
+            "medicine_alarms": [],
             "summary": {
                 "expired_count": 0,
                 "expiring_soon_count": 0,
                 "low_stock_count": 0,
+                "medicine_alarm_count": 0,
                 "total_alerts": 0
             }
         }
@@ -107,13 +109,29 @@ class NotificationService:
                     "message": f"Medicine '{med.medicine_name}' is critically low ({med.quantity} left)."
                 })
 
+            # Check Medicine Intake Reminder & Alarm
+            if med.reminder_time:
+                alerts["medicine_alarms"].append({
+                    "id": med.id,
+                    "name": med.medicine_name,
+                    "dosage": med.dosage or "Standard dose",
+                    "reminderTime": med.reminder_time,
+                    "frequency": med.frequency or "Once Daily",
+                    "isAlarmActive": bool(med.is_alarm_active),
+                    "lastTaken": med.last_taken or "",
+                    "quantity": med.quantity,
+                    "message": f"Scheduled dose: {med.medicine_name} ({med.dosage or 'Standard dose'}) at {med.reminder_time}"
+                })
+
         alerts["summary"]["expired_count"] = len(alerts["expired_items"])
         alerts["summary"]["expiring_soon_count"] = len(alerts["expiring_soon_items"])
         alerts["summary"]["low_stock_count"] = len(alerts["low_stock_items"])
+        alerts["summary"]["medicine_alarm_count"] = len(alerts["medicine_alarms"])
         alerts["summary"]["total_alerts"] = (
             len(alerts["expired_items"]) +
             len(alerts["expiring_soon_items"]) +
-            len(alerts["low_stock_items"])
+            len(alerts["low_stock_items"]) +
+            len(alerts["medicine_alarms"])
         )
 
         return alerts

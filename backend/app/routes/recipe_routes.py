@@ -45,3 +45,30 @@ def get_recipe_detail(recipe_id):
         "success": True,
         "data": recipe.to_dict()
     }), 200
+
+
+@recipe_bp.route("/api/recipes/ai-generate", methods=["POST"])
+def ai_generate_recipe():
+    data = request.get_json(silent=True) or {}
+    user_id = data.get("user_id", 1)
+    try:
+        user_id = int(user_id)
+    except (ValueError, TypeError):
+        user_id = 1
+
+    selected_ingredients = data.get("ingredients", [])
+    preference = data.get("preference", "balanced")
+    meal_type = data.get("meal_type", "Dinner")
+
+    recipe = RecipeService.generate_ai_recipe(
+        user_id=user_id,
+        selected_ingredients=selected_ingredients,
+        preference=preference,
+        meal_type=meal_type
+    )
+
+    return jsonify({
+        "success": True,
+        "message": "AI recipe generated successfully!",
+        "recipe": recipe
+    }), 201

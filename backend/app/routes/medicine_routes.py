@@ -79,6 +79,19 @@ def delete_medicine_api(medicine_id):
     }), 200
 
 
+@medicine_bp.route("/api/medicines/<int:medicine_id>/take", methods=["POST"])
+def take_medicine_api(medicine_id):
+    med, error = MedicineService.mark_as_taken(medicine_id)
+    if error:
+        return jsonify({"success": False, "message": error}), 404
+
+    return jsonify({
+        "success": True,
+        "message": f"Dose logged! Taken {med.medicine_name}.",
+        "data": med.to_dict()
+    }), 200
+
+
 # --- Legacy Routes for Backward-Compatibility ---
 
 @medicine_bp.route("/medicines", methods=["GET"])

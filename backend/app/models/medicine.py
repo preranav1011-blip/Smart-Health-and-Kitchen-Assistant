@@ -16,6 +16,12 @@ class Medicine(db.Model):
     prescription = db.Column(db.String(50), default="No")
     low_stock = db.Column("lowStock", db.Integer, default=5)
     notes = db.Column(db.Text, nullable=True)
+    
+    # Medicine Timing and Alarm Reminders
+    reminder_time = db.Column("reminderTime", db.String(50), nullable=True) # e.g. "08:00"
+    frequency = db.Column(db.String(100), default="Once Daily") # e.g. "Once Daily", "Twice Daily", "Before Bed"
+    is_alarm_active = db.Column("isAlarmActive", db.Boolean, default=True)
+    last_taken = db.Column("lastTaken", db.String(50), nullable=True)
 
     def to_dict(self):
         return {
@@ -37,5 +43,12 @@ class Medicine(db.Model):
             "prescription": self.prescription or "No",
             "lowStock": self.low_stock if self.low_stock is not None else 5,
             "low_stock": self.low_stock if self.low_stock is not None else 5,
-            "notes": self.notes or ""
+            "notes": self.notes or "",
+            "reminderTime": self.reminder_time or "",
+            "reminder_time": self.reminder_time or "",
+            "frequency": self.frequency or "Once Daily",
+            "isAlarmActive": bool(self.is_alarm_active) if self.is_alarm_active is not None else True,
+            "is_alarm_active": bool(self.is_alarm_active) if self.is_alarm_active is not None else True,
+            "lastTaken": self.last_taken or "",
+            "last_taken": self.last_taken or ""
         }
