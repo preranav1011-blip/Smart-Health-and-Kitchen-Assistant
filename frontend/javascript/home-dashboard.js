@@ -1,4 +1,4 @@
-const API_URL = "https://smart-health-and-kitchen-assistant.onrender.com";
+﻿const API_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") ? "http://localhost:5000" : "https://smart-health-and-kitchen-assistant.onrender.com";
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
 window.addEventListener("DOMContentLoaded", () => {
     loadKitchenData();
     loadMedicineData();
+    loadDashboardCharts();
 });
 
 // ---------------------
@@ -199,3 +200,69 @@ function updateGlobalCounts(low,critical){
 document.getElementById("addMedicineBtn").addEventListener("click", () => {
     window.location.href = "additemmed.html";
 });
+
+// ---------------------
+// Interactive Charts
+// ---------------------
+async function loadDashboardCharts() {
+    try {
+        const userId = localStorage.getItem("user_id");
+        if (!userId) return;
+
+        const res = await fetch(`${API_URL}/api/dashboard/summary?user_id=${userId}`);
+        const json = await res.json();
+        if (!json.success || !json.data || !json.data.charts) return;
+
+        const charts = json.data.charts;
+
+        // 1. Inventory Chart
+        const invCanvas = document.getElementById("inventoryChart");
+        if (invCanvas && typeof Chart !== "undefined") {
+            new Chart(invCanvas, {
+                type: "doughnut",
+                data: {
+                    labels: charts.inventory_breakdown.labels,
+                    datasets: [{
+                        data: charts.inventory_breakdown.data,
+                        backgroundColor: ["#4CAF50", "#2196F3"]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: "bottom" }
+                    }
+                }
+            });
+        }
+
+        // 2. Expiry Health Chart
+        const expCanvas = document.getElementById("expiryChart");
+        if (expCanvas && typeof Chart !== "undefined") {
+            new Chart(expCanvas, {
+                type: "bar",
+                data: {
+                    labels: charts.expiry_health.labels,
+                    datasets: [{
+                        label: "Items Count",
+                        data: charts.expiry_health.data,
+                        backgroundColor: charts.expiry_health.colors
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { precision: 0 } }
+                    }
+                }
+            });
+        }
+    } catch (err) {
+        console.error("Failed to load dashboard charts:", err);
+    }
+}

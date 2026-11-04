@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  # MySQL Database Service
+  mysql_db:
+    image: mysql:8.0
+    container_name: smart_health_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword123
+      MYSQL_DATABASE: smart_health_db
+      MYSQL_USER: assistant_user
+      MYSQL_PASSWORD: assistant_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_storage:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "assistant_user", "-passistant_pass"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - assistant_net
+
+  # Python Flask REST API Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: smart_health_api
+    restart: always
+    environment:
+      FLASK_ENV: production
+      DATABASE_URL: mysql+pymysql://assistant_user:assistant_pass@mysql_db:3306/smart_health_db
+      SECRET_KEY: ${SECRET_KEY:-super-secret-production-key-smart-health}
+      PORT: 5000
+    ports:
+      - "5000:5000"
+    depends_on:
+      mysql_db:
+        condition: service_healthy
+    networks:
+      - assistant_net
+
+  # Frontend Nginx Web Server
+  frontend:
+    image: nginx:alpine
+    container_name: smart_health_frontend
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+    depends_on:
+      - backend
+    networks:
+      - assistant_net
+
+networks:
+  assistant_net:
+    driver: bridge
+
+volumes:
+  mysql_storage:
+    driver: local

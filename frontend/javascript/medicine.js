@@ -1,3 +1,4 @@
+﻿const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:5000' : 'https://smart-health-and-kitchen-assistant.onrender.com';
 const contentArea = document.querySelector(".content-area");
 const searchInput = document.getElementById("search");
 const searchBtn = document.querySelector(".search-btn");
@@ -20,7 +21,7 @@ let medicines = [];
 
 const userId = localStorage.getItem("user_id");
 
-fetch(`https://smart-health-and-kitchen-assistant.onrender.com/medicines?user_id=${userId}`)
+fetch(`${API_BASE}/medicines?user_id=${userId}`)
     .then(response => response.json())
     .then(data => {
 
@@ -108,7 +109,7 @@ function deleteMedicine(id){
 
     if(confirm("Delete this medicine?")){
 
-        fetch(`https://smart-health-and-kitchen-assistant.onrender.com/delete-medicine/${id}`,{
+        fetch(`${API_BASE}/delete-medicine/${id}`,{
 
             method:"DELETE"
 
@@ -221,7 +222,7 @@ function editMedicine(id){
     medicine.prescription = newPrescription;
     medicine.notes = newNotes.trim();
 
-    fetch(`https://smart-health-and-kitchen-assistant.onrender.com/update-medicine/${id}`, {
+    fetch(`${API_BASE}/update-medicine/${id}`, {
 
         method: "PUT",
 

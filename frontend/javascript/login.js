@@ -1,3 +1,4 @@
+﻿const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:5000' : 'https://smart-health-and-kitchen-assistant.onrender.com';
 document.getElementById("loginForm").addEventListener("submit", async function (e) {
 
     e.preventDefault();
@@ -11,7 +12,7 @@ document.getElementById("loginForm").addEventListener("submit", async function (
 
     try {
 
-        const response = await fetch("https://smart-health-and-kitchen-assistant.onrender.com/login", {
+        const response = await fetch(`${API_BASE}/login`, {
 
             method: "POST",
 

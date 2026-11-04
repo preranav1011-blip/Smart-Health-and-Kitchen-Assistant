@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
     <head>
         <title>Smart Health and Kitchen Assistant</title>
@@ -144,6 +144,24 @@
         </section>
 
         <!-- Suggested Additions Section -->
+                <!-- Interactive Analytics & Charts Section -->
+        <section class="charts-section" style="margin: 30px 0;">
+            <h2 style="margin-bottom: 15px;">📊 Inventory Analytics & Expiry Trends</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); text-align: center;">
+                    <h3 style="margin-top:0; font-size:16px; color:#333;">Inventory Distribution</h3>
+                    <div style="height: 240px; position: relative;">
+                        <canvas id="inventoryChart"></canvas>
+                    </div>
+                </div>
+                <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); text-align: center;">
+                    <h3 style="margin-top:0; font-size:16px; color:#333;">Expiry Health Overview</h3>
+                    <div style="height: 240px; position: relative;">
+                        <canvas id="expiryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
         <section class="insights-section">
             <h2>Recommended Features & Insights</h2>
             <div class="suggestions-grid">
@@ -179,7 +197,7 @@
         });
     </script>
 
-    <script src="javascript/home-dashboard.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>`n    <script src="javascript/home-dashboard.js"></script>
     <script src="javascript/logout.js"></script>
 
 </body>

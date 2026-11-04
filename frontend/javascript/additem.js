@@ -1,3 +1,4 @@
+﻿const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:5000' : 'https://smart-health-and-kitchen-assistant.onrender.com';
 const form = document.getElementById("addItemForm");
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -24,7 +25,7 @@ form.addEventListener("submit", function (event) {
         expiryDate: document.getElementById("expiryDate").value
     };
 
-    fetch("https://smart-health-and-kitchen-assistant.onrender.com/add-item", {
+    fetch(`${API_BASE}/add-item`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

@@ -1,3 +1,4 @@
+﻿const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:5000' : 'https://smart-health-and-kitchen-assistant.onrender.com';
 const contentArea = document.querySelector(".content-area");
 const searchInput = document.getElementById("search");
 const searchBtn = document.querySelector(".search-btn");
@@ -23,7 +24,7 @@ async function loadItems() {
         const userId = localStorage.getItem("user_id");
 
         const response = await fetch(
-            `https://smart-health-and-kitchen-assistant.onrender.com/items?user_id=${userId}`
+            `${API_BASE}/items?user_id=${userId}`
         );
         items = await response.json();
 
@@ -108,7 +109,7 @@ async function deleteItem(id) {
     try {
 
         const response = await fetch(
-            `https://smart-health-and-kitchen-assistant.onrender.com/delete-item/${id}`,
+            `${API_BASE}/delete-item/${id}`,
             {
                 method: "DELETE"
             }
@@ -143,7 +144,7 @@ async function editItem(id) {
     try {
 
         const response = await fetch(
-            `https://smart-health-and-kitchen-assistant.onrender.com/update-item/${id}`,
+            `${API_BASE}/update-item/${id}`,
             {
                 method: "PUT",
                 headers: {

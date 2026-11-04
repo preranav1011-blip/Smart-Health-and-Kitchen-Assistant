@@ -1,0 +1,25 @@
+# Virtual environments
+venv/
+backend/venv/
+ENV/
+env/
+
+# Python cache & artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+test-results.xml
+pytest-results.xml
+
+# Databases & local credentials
+*.db
+*.sqlite3
+instance/
+.env
+.env.local
+
+# Operating System
+.DS_Store
+Thumbs.db

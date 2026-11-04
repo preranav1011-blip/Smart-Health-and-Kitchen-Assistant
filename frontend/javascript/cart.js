@@ -1,3 +1,4 @@
+﻿const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:5000' : 'https://smart-health-and-kitchen-assistant.onrender.com';
 const cartContainer = document.getElementById("cart-items");
 let purchasedCount = 0;
 
@@ -18,8 +19,8 @@ async function loadCart() {
         const userId = localStorage.getItem("user_id");
 
         const [kitchenResponse, medicineResponse] = await Promise.all([
-            fetch(`https://smart-health-and-kitchen-assistant.onrender.com/items?user_id=${userId}`),
-            fetch(`https://smart-health-and-kitchen-assistant.onrender.com/medicines?user_id=${userId}`)
+            fetch(`${API_BASE}/items?user_id=${userId}`),
+            fetch(`${API_BASE}/medicines?user_id=${userId}`)
         ]);
 
         const kitchenItems = await kitchenResponse.json();
@@ -174,7 +175,7 @@ async function purchaseItem(item) {
         if (item.type === "Kitchen") {
 
             response = await fetch(
-                `https://smart-health-and-kitchen-assistant.onrender.com/update-item/${item.id}`,
+                `${API_BASE}/update-item/${item.id}`,
                 {
                     method: "PUT",
 
@@ -198,7 +199,7 @@ async function purchaseItem(item) {
         else if (item.type === "Medicine") {
 
             response = await fetch(
-                `https://smart-health-and-kitchen-assistant.onrender.com/update-medicine/${item.id}`,
+                `${API_BASE}/update-medicine/${item.id}`,
                 {
                     method: "PUT",
 
