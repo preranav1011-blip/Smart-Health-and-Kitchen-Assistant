@@ -1,9 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <title>Smart Health and Kitchen Assistant</title>
     <link rel = "icon" href = "images/Gemini_Generated_Image_7rve5h7rve5h7rve.png">
     <link rel="stylesheet" href="css/additemmed.css">
+    <link rel="stylesheet" href="css/nav.css">
 </head>
 <body>
     <header class="top-navbar">
@@ -108,6 +109,22 @@
                         required>
                 </div>
 
+                                <div class="input-group">
+                    <label>⏰ Intake Reminder Time</label>
+                    <input type="time" id="reminderTime" value="09:00">
+                </div>
+
+                <div class="input-group">
+                    <label>Intake Frequency</label>
+                    <select id="frequency">
+                        <option value="Once Daily (Morning)">Once Daily (Morning)</option>
+                        <option value="Once Daily (Evening)">Once Daily (Evening)</option>
+                        <option value="Twice Daily (Morning & Evening)">Twice Daily (Morning & Evening)</option>
+                        <option value="Three Times Daily">Three Times Daily</option>
+                        <option value="Before Bedtime">Before Bedtime</option>
+                        <option value="As Needed">As Needed</option>
+                    </select>
+                </div>
                 <div class="input-group">
                     <label>Upload Medicine Image</label>
                     <input type="file">
@@ -129,5 +146,6 @@
 
     </div>
     <script src="javascript/additemmed.js"></script>
+    <script src="javascript/nav.js"></script>
 </body>
 </html>
