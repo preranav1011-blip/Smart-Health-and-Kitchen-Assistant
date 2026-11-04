@@ -48,6 +48,40 @@ def api_login():
     }), 200
 
 
+@auth_bp.route("/api/auth/profile", methods=["GET"])
+def api_profile():
+    user_id = request.args.get("user_id")
+    if not user_id:
+        return jsonify({"success": False, "message": "user_id is required"}), 400
+    try:
+        user = AuthService.get_user_by_id(int(user_id))
+    except ValueError:
+        return jsonify({"success": False, "message": "Invalid user_id"}), 400
+
+    if not user:
+        return jsonify({"success": False, "message": "User not found"}), 404
+
+    return jsonify({
+        "success": True,
+        "user": user.to_dict()
+    }), 200
+
+
+@auth_bp.route("/api/auth/change-password", methods=["POST"])
+def api_change_password():
+    data = request.get_json(silent=True) or {}
+    user_id = data.get("user_id")
+    current_password = data.get("current_password")
+    new_password = data.get("new_password")
+
+    if not user_id or not current_password or not new_password:
+        return jsonify({"success": False, "message": "user_id, current_password, and new_password are required"}), 400
+
+    success, message = AuthService.change_password(int(user_id), current_password, new_password)
+    status_code = 200 if success else 400
+    return jsonify({"success": success, "message": message}), status_code
+
+
 # Legacy endpoints for 100% backward compatibility with existing frontend
 @auth_bp.route("/signup", methods=["POST"])
 def legacy_signup():

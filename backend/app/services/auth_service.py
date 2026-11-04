@@ -28,3 +28,16 @@ class AuthService:
     @staticmethod
     def get_user_by_id(user_id: int):
         return db.session.get(User, user_id)
+
+    @staticmethod
+    def change_password(user_id: int, current_password: str, new_password: str):
+        user = db.session.get(User, user_id)
+        if not user:
+            return False, "User not found"
+        if not user.check_password(current_password):
+            return False, "Incorrect current password"
+        if not new_password or len(str(new_password)) < 6:
+            return False, "New password must be at least 6 characters"
+        user.set_password(new_password)
+        db.session.commit()
+        return True, "Password updated successfully"
