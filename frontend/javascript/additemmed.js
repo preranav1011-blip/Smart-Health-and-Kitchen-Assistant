@@ -56,7 +56,10 @@ medicineForm.addEventListener("submit", function(e){
 
         lowStock: document.getElementById("lowStock").value,
 
-        notes: document.getElementById("notes").value
+        notes: document.getElementById("notes").value,
+        reminderTime: document.getElementById("reminderTime") ? document.getElementById("reminderTime").value : "09:00",
+        frequency: document.getElementById("frequency") ? document.getElementById("frequency").value : "Once Daily",
+        isAlarmActive: true
 
     };
 

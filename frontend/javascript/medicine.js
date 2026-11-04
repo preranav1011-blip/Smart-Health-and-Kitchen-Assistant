@@ -78,6 +78,7 @@ function displayMedicines(data = medicines){
 
             <p><strong>Prescription:</strong> ${medicine.prescription}</p>
 
+            ${medicine.reminderTime ? `<p style="color:#2e7d32; font-weight:600;"><strong>⏰ Alarm Time:</strong> ${medicine.reminderTime} (${medicine.frequency || 'Daily'})</p>` : ''}
             <p><strong>Notes:</strong> ${medicine.notes}</p>
 
             <p><strong>Status:</strong> ${status.text}</p>
@@ -89,6 +90,9 @@ function displayMedicines(data = medicines){
                 ""
             }
 
+            <button style="background:#2e7d32; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="takeMedicineDose(${medicine.id})">
+                ✓ Take Dose
+            </button>
             <button class="edit-btn" onclick="editMedicine(${medicine.id})">
                 Edit
             </button>
@@ -453,4 +457,20 @@ function filterMedicines(type, element){
 
     displayMedicines(filtered);
 
+}
+
+async function takeMedicineDose(id) {
+    try {
+        const res = await fetch(`${API_BASE}/api/medicines/${id}/take`, { method: "POST" });
+        const data = await res.json();
+        if (data.success) {
+            alert(data.message);
+            window.location.reload();
+        } else {
+            alert("Could not log dose.");
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Failed to reach server.");
+    }
 }
