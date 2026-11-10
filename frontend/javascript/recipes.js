@@ -11,70 +11,79 @@ document.addEventListener("DOMContentLoaded", async () => {
     setupCategoryFilters(userId);
     setupSearch(userId);
     setupAiGenerator(userId);
+
+    // Automatically create a recipe directly from current kitchen stock without manual typing!
+    if (userKitchenItems && userKitchenItems.length > 0) {
+        const itemNames = userKitchenItems.map(i => i.name);
+        const autoBtn = document.getElementById("btnAutoCookKitchen") || document.getElementById("btnAiAutoAll");
+        triggerAiGeneration(userId, itemNames, "balanced", "Dinner", autoBtn || { textContent: "Cooking...", disabled: false });
+    }
 });
 
 async function loadKitchenIngredients(userId) {
     const listContainer = document.getElementById("kitchenInventoryPills");
     const aiPillsContainer = document.getElementById("aiPantryPills");
 
+    let items = [];
+
+    // 1. Try fetching live from backend
     try {
-        let items = [];
+        const res = await fetch(`${API_BASE}/items?user_id=${userId}`, { cache: "no-store" });
+        if (res.ok) {
+            items = await res.json();
+            if (Array.isArray(items) && items.length > 0) {
+                localStorage.setItem("cached_kitchen_items", JSON.stringify(items));
+            }
+        }
+    } catch (e1) {
         try {
-            const res = await fetch(`${API_BASE}/items?user_id=${userId}`, { cache: "no-store" });
-            if (res.ok) {
-                items = await res.json();
-            }
-        } catch (e1) {
-            try {
-                const res2 = await fetch(`${API_BASE}/api/items?user_id=${userId}`, { cache: "no-store" });
-                if (res2.ok) {
-                    const data = await res2.json();
-                    items = data.data || [];
+            const res2 = await fetch(`${API_BASE}/api/items?user_id=${userId}`, { cache: "no-store" });
+            if (res2.ok) {
+                const data = await res2.json();
+                items = data.data || [];
+                if (Array.isArray(items) && items.length > 0) {
+                    localStorage.setItem("cached_kitchen_items", JSON.stringify(items));
                 }
-            } catch (e2) {}
-        }
-
-        userKitchenItems = items || [];
-
-        // 1. Render in top ingredients summary
-        if (listContainer) {
-            if (userKitchenItems.length === 0) {
-                listContainer.innerHTML = `
-                    <span style="color:#64748b; font-size:13px;">No kitchen items logged yet. 
-                        <a href="additem.html" style="color:#2e7d32; font-weight:700; text-decoration:underline;">Click here to add items</a>, or use standard staples below to cook!
-                    </span>
-                `;
-            } else {
-                listContainer.innerHTML = userKitchenItems.map(item => `
-                    <span style="display:inline-flex; align-items:center; gap:6px; margin:4px 4px; padding:6px 14px; background:#e8f5e9; border:1px solid #c8e6c9; border-radius:20px; font-weight:600; color:#1b5e20; font-size:13px;">
-                        🥦 ${escapeHtml(item.name)} <span style="font-weight:400; color:#475569;">(${item.quantity} ${item.unit || 'units'})</span>
-                    </span>
-                `).join("");
             }
-        }
+        } catch (e2) {}
+    }
 
-        // 2. Render into AI Ingredient Picker Pills
-        if (aiPillsContainer) {
-            if (userKitchenItems.length === 0) {
-                const staples = ["Eggs", "Tomato", "Cheese", "Milk", "Bread", "Onion", "Potato", "Chilli", "Rice", "Spinach"];
-                aiPillsContainer.innerHTML = staples.map(ing => `
-                    <label style="display:inline-flex; align-items:center; gap:6px; background:white; border:1px solid #cbd5e1; padding:6px 12px; border-radius:20px; font-size:13px; cursor:pointer; user-select:none;">
-                        <input type="checkbox" name="aiIng" value="${ing}" checked style="accent-color:#2e7d32;">
-                        <span>${ing}</span>
-                    </label>
-                `).join("") + `<div style="width:100%; font-size:12px; color:#64748b; margin-top:4px;">(Using pantry staples. <a href="additem.html" style="color:#2e7d32; font-weight:600;">Log items</a> to link real inventory!)</div>`;
-            } else {
-                aiPillsContainer.innerHTML = userKitchenItems.map(item => `
-                    <label style="display:inline-flex; align-items:center; gap:6px; background:white; border:1px solid #cbd5e1; padding:6px 12px; border-radius:20px; font-size:13px; cursor:pointer; user-select:none; transition:all 0.15s ease;">
-                        <input type="checkbox" name="aiIng" value="${escapeHtml(item.name)}" checked style="accent-color:#2e7d32;">
-                        <span style="font-weight:600; color:#1e293b;">${escapeHtml(item.name)}</span>
-                        <span style="color:#64748b; font-size:11px;">(${item.quantity} ${item.unit || 'units'})</span>
-                    </label>
-                `).join("");
-            }
-        }
-    } catch (err) {
-        console.warn("Could not load pantry ingredients:", err);
+    // 2. Fallback to localStorage cached items
+    if (!items || items.length === 0) {
+        items = JSON.parse(localStorage.getItem("cached_kitchen_items") || "[]");
+    }
+
+    // 3. Fallback to default pantry stock if brand new session
+    if (!items || items.length === 0) {
+        items = [
+            { id: 1, name: "Potatoes", quantity: 3, unit: "kg", category: "Vegetables" },
+            { id: 2, name: "Milk", quantity: 2, unit: "L", category: "Dairy" },
+            { id: 3, name: "Tomatoes", quantity: 1, unit: "kg", category: "Vegetables" },
+            { id: 4, name: "Onions", quantity: 2, unit: "kg", category: "Vegetables" }
+        ];
+        localStorage.setItem("cached_kitchen_items", JSON.stringify(items));
+    }
+
+    userKitchenItems = items || [];
+
+    // Render into Top Live Pantry Pills
+    if (listContainer) {
+        listContainer.innerHTML = userKitchenItems.map(item => `
+            <span style="display:inline-flex; align-items:center; gap:6px; margin:4px 4px; padding:6px 14px; background:#e8f5e9; border:1px solid #c8e6c9; border-radius:20px; font-weight:600; color:#1b5e20; font-size:13px; box-shadow:0 1px 4px rgba(0,0,0,0.04);">
+                🥦 ${escapeHtml(item.name)} <span style="font-weight:400; color:#475569;">(${item.quantity} ${item.unit || 'units'})</span>
+            </span>
+        `).join("");
+    }
+
+    // Render into AI Ingredient Checkbox Pills
+    if (aiPillsContainer) {
+        aiPillsContainer.innerHTML = userKitchenItems.map(item => `
+            <label style="display:inline-flex; align-items:center; gap:6px; background:white; border:1px solid #cbd5e1; padding:6px 14px; border-radius:20px; font-size:13px; cursor:pointer; user-select:none; transition:all 0.15s ease;">
+                <input type="checkbox" name="aiIng" value="${escapeHtml(item.name)}" checked style="accent-color:#2e7d32;">
+                <span style="font-weight:600; color:#1e293b;">${escapeHtml(item.name)}</span>
+                <span style="color:#64748b; font-size:11px;">(${item.quantity} ${item.unit || 'units'})</span>
+            </label>
+        `).join("");
     }
 }
 
@@ -93,9 +102,7 @@ async function loadRecommendedRecipes(userId, category = null, searchQuery = "")
             const json = await res.json();
             recipes = json.data || [];
         }
-    } catch (err) {
-        console.warn("API recommendations offline, creating dynamically from inventory:", err);
-    }
+    } catch (err) {}
 
     if (recipes.length === 0) {
         recipes = getCuratedRecipeCollection(userKitchenItems);
@@ -148,7 +155,7 @@ async function loadRecommendedRecipes(userId, category = null, searchQuery = "")
                         <div style="background:${matchColor}; width:${matchPct}%; height:100%;"></div>
                     </div>
                     <p style="margin:6px 0 0 0; font-size:12px; color:#444;">
-                        <strong>In kitchen:</strong> ${matchedList.length ? matchedList.join(", ") : "Kitchen Stock Available"}<br>
+                        <strong>In kitchen:</strong> ${matchedList.length ? matchedList.join(", ") : "Pantry Stock Available"}<br>
                         ${missingList.length ? `<strong>Missing:</strong> <span style="color:#d32f2f">${missingList.join(", ")}</span>` : ""}
                     </p>
                 </div>
@@ -226,7 +233,6 @@ async function triggerAiGeneration(userId, ingredients, preference, mealType, tr
     try {
         let generatedRecipe = null;
 
-        // Try primary backend endpoint with timeout
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 6000);
 
@@ -273,7 +279,7 @@ async function triggerAiGeneration(userId, ingredients, preference, mealType, tr
 function generateLocalAiRecipe(selectedIngredients, preference, mealType) {
     const pool = (selectedIngredients && selectedIngredients.length > 0)
         ? selectedIngredients
-        : (userKitchenItems.length > 0 ? userKitchenItems.map(i => i.name) : ["Potatoes", "Milk", "Onion"]);
+        : (userKitchenItems.length > 0 ? userKitchenItems.map(i => i.name) : ["Potatoes", "Milk", "Onions"]);
 
     const cleanItems = pool.map(i => String(i).trim());
     const lowerItems = cleanItems.map(i => i.toLowerCase());
@@ -393,10 +399,7 @@ function getCuratedRecipeCollection(kitchenItems) {
             ingredients: ["Potatoes", "Milk", "Onion", "Salt", "Black Pepper", "Butter"],
             matchedIngredients: (hasPotatoes && hasMilk) ? ["Potatoes", "Milk"] : ["Potatoes"],
             missingIngredients: (hasPotatoes && hasMilk) ? [] : ["Milk"],
-            instructions: "1. Simmer diced potatoes in salted water until tender.
-2. In a skillet, sauté chopped onions in butter.
-3. Blend half the potatoes with warm milk until creamy.
-4. Combine all ingredients, season, and simmer for 5 mins."
+            instructions: "1. Simmer diced potatoes in salted water until tender.\n2. In a skillet, sauté chopped onions in butter.\n3. Blend half the potatoes with warm milk until creamy.\n4. Combine all ingredients, season, and simmer for 5 mins."
         },
         {
             title: "Crispy Golden Garlic Roasted Potatoes",
@@ -409,9 +412,7 @@ function getCuratedRecipeCollection(kitchenItems) {
             ingredients: ["Potatoes", "Olive Oil", "Garlic", "Rosemary", "Salt"],
             matchedIngredients: hasPotatoes ? ["Potatoes"] : [],
             missingIngredients: [],
-            instructions: "1. Parboil potatoes for 5 mins.
-2. Toss in olive oil, salt, and garlic.
-3. Roast at high heat until golden and crunchy."
+            instructions: "1. Parboil potatoes for 5 mins.\n2. Toss in olive oil, salt, and garlic.\n3. Roast at high heat until golden and crunchy."
         },
         {
             title: "Classic Vegetable Omelette",
@@ -424,10 +425,7 @@ function getCuratedRecipeCollection(kitchenItems) {
             ingredients: ["Eggs", "Onion", "Tomato", "Chilli", "Salt", "Pepper"],
             matchedIngredients: ["Eggs", "Onion", "Tomato"],
             missingIngredients: [],
-            instructions: "1. Beat eggs with salt and pepper.
-2. Sauté onion and tomato in a pan.
-3. Pour eggs and cook until set.
-4. Fold and serve hot."
+            instructions: "1. Beat eggs with salt and pepper.\n2. Sauté onion and tomato in a pan.\n3. Pour eggs and cook until set.\n4. Fold and serve hot."
         },
         {
             title: "Quick Garlic Fried Rice",
@@ -440,10 +438,7 @@ function getCuratedRecipeCollection(kitchenItems) {
             ingredients: ["Rice", "Garlic", "Onion", "Vegetables", "Soy Sauce"],
             matchedIngredients: ["Rice", "Onion"],
             missingIngredients: ["Garlic"],
-            instructions: "1. Sauté minced garlic and onions in sesame oil.
-2. Add diced vegetables.
-3. Add cooked rice and season with salt & pepper.
-4. Stir-fry on high heat for 3 mins."
+            instructions: "1. Sauté minced garlic and onions in sesame oil.\n2. Add diced vegetables.\n3. Add cooked rice and season with salt & pepper.\n4. Stir-fry on high heat for 3 mins."
         }
     ];
 

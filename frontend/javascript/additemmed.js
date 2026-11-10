@@ -1,3 +1,26 @@
+
+function formatReminderTime(raw) {
+    if (!raw) return "10:00";
+    let s = String(raw).trim().toUpperCase();
+    const isPM = s.includes("PM");
+    const isAM = s.includes("AM");
+    s = s.replace(/AM|PM/g, "").trim();
+
+    let h = 0, m = 0;
+    if (s.includes(":")) {
+        const parts = s.split(":");
+        h = parseInt(parts[0], 10);
+        m = parseInt(parts[1], 10);
+    } else {
+        h = parseInt(s, 10);
+        m = 0;
+    }
+    if (isNaN(h) || isNaN(m)) return "10:00";
+    if (isPM && h < 12) h += 12;
+    if (isAM && h === 12) h = 0;
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+
 ﻿const API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:" || !window.location.hostname)
     ? "http://localhost:5000"
     : "https://smart-health-and-kitchen-assistant.onrender.com";
@@ -59,7 +82,7 @@ medicineForm.addEventListener("submit", function(e){
         lowStock: document.getElementById("lowStock").value,
 
         notes: document.getElementById("notes").value,
-        reminderTime: document.getElementById("reminderTime") ? document.getElementById("reminderTime").value : "09:00",
+        reminderTime: formatReminderTime(document.getElementById("reminderTime") ? document.getElementById("reminderTime").value : "10:00"),
         frequency: document.getElementById("frequency") ? document.getElementById("frequency").value : "Once Daily",
         isAlarmActive: true
 

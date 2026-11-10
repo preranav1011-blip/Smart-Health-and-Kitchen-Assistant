@@ -95,6 +95,9 @@ function displayMedicines(data = medicines){
             <button style="background:#2e7d32; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="takeMedicineDose(${medicine.id})">
                 ✓ Take Dose
             </button>
+            <button style="background:#6366f1; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="changeMedicineAlarm(${medicine.id})" title="Set alarm time (e.g. 10:00 or 10)">
+                ⏰ Set Alarm
+            </button>
             <button class="edit-btn" onclick="editMedicine(${medicine.id})">
                 Edit
             </button>
@@ -476,3 +479,52 @@ async function takeMedicineDose(id) {
         alert("Failed to reach server.");
     }
 }
+
+
+function formatReminderTime(raw) {
+    if (!raw) return "10:00";
+    let s = String(raw).trim().toUpperCase();
+    const isPM = s.includes("PM");
+    const isAM = s.includes("AM");
+    s = s.replace(/AM|PM/g, "").trim();
+
+    let h = 0, m = 0;
+    if (s.includes(":")) {
+        const parts = s.split(":");
+        h = parseInt(parts[0], 10);
+        m = parseInt(parts[1], 10);
+    } else {
+        h = parseInt(s, 10);
+        m = 0;
+    }
+    if (isNaN(h) || isNaN(m)) return "10:00";
+    if (isPM && h < 12) h += 12;
+    if (isAM && h === 12) h = 0;
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+
+window.changeMedicineAlarm = async function(id) {
+    const med = medicines.find(m => m.id == id);
+    if (!med) return;
+    const curTime = med.reminderTime || "10:00";
+    const entered = prompt(`Set daily intake alarm time for ${med.medicineName || med.name} (e.g. 10 or 10:00):`, curTime);
+    if (entered === null) return;
+    const normalized = formatReminderTime(entered);
+    med.reminderTime = normalized;
+    med.isAlarmActive = true;
+
+    localStorage.setItem("cached_medicines", JSON.stringify(medicines));
+
+    try {
+        await fetch(`${API_BASE}/update-medicine/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(med)
+        });
+        alert(`Alarm set to ${normalized} for ${med.medicineName || med.name}! It will ring when current time is ${normalized}.`);
+        displayMedicines();
+    } catch(e) {
+        alert(`Alarm set to ${normalized} for ${med.medicineName || med.name}!`);
+        displayMedicines();
+    }
+};

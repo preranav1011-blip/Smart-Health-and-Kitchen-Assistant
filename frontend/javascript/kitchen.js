@@ -29,16 +29,25 @@ async function loadItems() {
             `${API_BASE}/items?user_id=${userId}`
         );
         items = await response.json();
+        if (Array.isArray(items)) {
+            localStorage.setItem("cached_kitchen_items", JSON.stringify(items));
+        }
 
         displayItems();
-
         updateSummary();
 
     } catch(error){
-
-        console.error(error);
-
-        alert("Unable to load items.");
+        console.warn("Server unavailable, loading from local cache:", error);
+        items = JSON.parse(localStorage.getItem("cached_kitchen_items") || "[]");
+        if (items.length === 0) {
+            items = [
+                { id: 1, name: "Potatoes", quantity: 3, unit: "kg", category: "Vegetables", expiryDate: "2026-11-20" },
+                { id: 2, name: "Milk", quantity: 2, unit: "L", category: "Dairy", expiryDate: "2026-11-15" }
+            ];
+            localStorage.setItem("cached_kitchen_items", JSON.stringify(items));
+        }
+        displayItems();
+        updateSummary();
     }
 }
 

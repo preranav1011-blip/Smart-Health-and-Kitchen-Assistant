@@ -1,125 +1,106 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile</title>
-
-    <link rel="stylesheet" href="profile.css">
-
-    <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"> -->
     <title>Smart Health and Kitchen Assistant</title>
-    <link rel = "icon" href = "images/Gemini_Generated_Image_7rve5h7rve5h7rve.png">
+    <link rel="icon" href="images/Gemini_Generated_Image_7rve5h7rve5h7rve.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="css/profile.css">
     <link rel="stylesheet" href="css/nav.css">
 </head>
 <body>
 
 <header class="top-navbar">
-
     <div class="logo">
         <i class="fa-solid fa-user"></i>
         My Profile
     </div>
-
 </header>
 
 <main class="container">
-
     <!-- Left Side -->
-
     <div class="profile-card">
-
-        <img src="https://i.pravatar.cc/200" alt="Profile">
-
-        <h2>John Doe</h2>
-
-        <p>john@example.com</p>
-
-        <button>Edit Profile</button>
-
+        <div style="width:120px; height:120px; border-radius:50%; background:linear-gradient(135deg, #2e7d32, #43a047); color:white; font-size:46px; font-weight:bold; display:flex; align-items:center; justify-content:center; margin:0 auto 15px auto; box-shadow:0 4px 14px rgba(46,125,50,0.3); border:4px solid white;">
+            <span id="profileAvatarLetter">👤</span>
+        </div>
+        <h2 id="cardProfileName">Loading User...</h2>
+        <p id="cardProfileEmail">user@example.com</p>
+        <span style="display:inline-block; background:#e8f5e9; color:#2e7d32; padding:4px 12px; border-radius:12px; font-size:12px; font-weight:700; margin-bottom:15px;">
+            Active Member
+        </span>
+        <button id="btnFocusEdit" style="background:#f1f5f9; border:1px solid #cbd5e1; color:#334155; padding:8px 16px; border-radius:6px; font-weight:600; cursor:pointer;">
+            ✏️ Edit Profile Info
+        </button>
     </div>
 
-
     <!-- Right Side -->
-
     <div class="details">
-
         <section class="info">
-
             <h2>Personal Information</h2>
-
             <div class="row">
                 <label>Full Name</label>
-                <input type="text" value="John Doe">
+                <input type="text" id="inputFullName" placeholder="Your Name">
             </div>
 
             <div class="row">
-                <label>Email</label>
-                <input type="email" value="john@example.com">
+                <label>Email Address</label>
+                <input type="email" id="inputEmail" placeholder="your.email@example.com">
             </div>
 
             <div class="row">
-                <label>Phone</label>
-                <input type="text" value="+91 9876543210">
+                <label>Phone Number</label>
+                <input type="text" id="inputPhone" placeholder="+91 9876543210">
             </div>
 
             <div class="row">
                 <label>Age</label>
-                <input type="number" value="22">
+                <input type="number" id="inputAge" placeholder="25" min="1" max="120">
             </div>
-
         </section>
 
-
+        <!-- Dynamic Live Stats -->
         <section class="stats">
-
             <div class="stat">
                 <i class="fa-solid fa-utensils"></i>
-                <h3>54</h3>
+                <h3 id="statKitchenCount">0</h3>
                 <p>Kitchen Items</p>
             </div>
 
             <div class="stat">
                 <i class="fa-solid fa-pills"></i>
-                <h3>18</h3>
+                <h3 id="statMedicineCount">0</h3>
                 <p>Medicines</p>
             </div>
 
             <div class="stat">
                 <i class="fa-solid fa-bell"></i>
-                <h3>9</h3>
-                <p>Notifications</p>
+                <h3 id="statNotifCount">0</h3>
+                <p>Active Alerts</p>
             </div>
 
             <div class="stat">
                 <i class="fa-solid fa-heart-pulse"></i>
-                <h3>96%</h3>
+                <h3 id="statHealthScore">100%</h3>
                 <p>Health Score</p>
             </div>
-
         </section>
 
-
         <section class="actions">
-
-            <button class="save">
+            <button class="save" id="btnSaveProfile">
                 <i class="fa-solid fa-floppy-disk"></i>
                 Save Changes
             </button>
 
-            <button class="logout">
+            <button class="logout" id="btnLogoutProfile">
                 <i class="fa-solid fa-right-from-bracket"></i>
                 Logout
             </button>
-
         </section>
-
     </div>
-
 </main>
 
-    <script src="javascript/nav.js"></script>
+<script src="javascript/profile.js"></script>
+<script src="javascript/nav.js"></script>
 </body>
 </html>

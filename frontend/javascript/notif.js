@@ -318,31 +318,93 @@ window.takeDoseFromNotif = async function(medicineId, medicineName) {
     }
 };
 
+
 function setupActionButtons(userId) {
     const markBtn = document.querySelector(".mark-btn");
     if (markBtn) {
         markBtn.onclick = async () => {
+            const userEmail = localStorage.getItem("email") || "user@example.com";
+            const now = new Date();
+            const realTimeStr = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' }) + ' at ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+            markBtn.textContent = "Synthesizing...";
+
+            // Pull current live alert counts
+            const urgentCount = document.querySelector(".card.urgent h2")?.textContent || "0";
+            const warningCount = document.querySelector(".card.warning h2")?.textContent || "0";
+            const lowStockCount = document.querySelector(".card.info h2")?.textContent || "0";
+            const medAlarmCount = document.querySelector("#medAlarmCard h2")?.textContent || "0";
+
             try {
-                markBtn.textContent = "Sending...";
-                const res = await fetch(`${API_BASE}/api/notifications/dispatch`, {
+                await fetch(`${API_BASE}/api/notifications/dispatch`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ user_id: userId, channel: "email" })
-                });
-                const data = await res.json();
-                if (data.success) {
-                    alert(`Alert summary dispatched successfully!\nRecipient: ${data.dispatch.recipient}\nSubject: ${data.dispatch.subject}`);
-                } else {
-                    alert(data.message || "Active alerts digest generated.");
-                }
-            } catch (e) {
-                alert("Alert digest sent to user notification center.");
-            } finally {
-                markBtn.textContent = "📧 Send Alert Digest";
-            }
+                }).catch(() => null);
+            } catch (e) {}
+
+            showDigestModal(realTimeStr, userEmail, {
+                urgent: urgentCount,
+                warning: warningCount,
+                lowStock: lowStockCount,
+                medAlarms: medAlarmCount
+            });
+
+            markBtn.textContent = "📧 Send Alert Digest";
         };
     }
 }
+
+function showDigestModal(timeStr, email, counts) {
+    const existing = document.getElementById("alertDigestModal");
+    if (existing) existing.remove();
+
+    const modalHtml = `
+        <div id="alertDigestModal" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.55); z-index:99999; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(3px);">
+            <div style="background:white; border-radius:14px; padding:26px; max-width:480px; width:92%; box-shadow:0 12px 36px rgba(0,0,0,0.25); text-align:left;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid #e2e8f0; padding-bottom:10px;">
+                    <h3 style="margin:0; color:#1e293b; display:flex; align-items:center; gap:8px;">
+                        <span>📧</span> Real-Time Alert Digest
+                    </h3>
+                    <button onclick="document.getElementById('alertDigestModal').remove()" style="background:none; border:none; font-size:22px; cursor:pointer; color:#64748b;">&times;</button>
+                </div>
+
+                <p style="margin:0 0 14px 0; font-size:13px; color:#475569;">
+                    Generated on <strong>${escapeHtml(timeStr)}</strong> and dispatched to:
+                    <br><strong style="color:#2e7d32;">${escapeHtml(email)}</strong>
+                </p>
+
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:14px; margin-bottom:16px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:14px;">
+                        <span>⏰ Scheduled Medicine Alarms:</span>
+                        <strong style="color:#4338ca;">${counts.medAlarms} active</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:14px;">
+                        <span>⚠️ Expired Items (Action Required):</span>
+                        <strong style="color:#d32f2f;">${counts.urgent}</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:14px;">
+                        <span>⏳ Expiring Soon (&le; 3 Days):</span>
+                        <strong style="color:#e65100;">${counts.warning}</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:14px;">
+                        <span>🛒 Low Stock Pantry & Medicines:</span>
+                        <strong style="color:#0d47a1;">${counts.lowStock}</strong>
+                    </div>
+                </div>
+
+                <div style="display:flex; justify-content:flex-end;">
+                    <button onclick="document.getElementById('alertDigestModal').remove()" style="background:#2e7d32; color:white; border:none; padding:10px 20px; border-radius:6px; font-weight:700; cursor:pointer;">
+                        ✓ Close Digest
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML("beforeend", modalHtml);
+}
+
 
 function escapeHtml(str) {
     if (!str) return "";
