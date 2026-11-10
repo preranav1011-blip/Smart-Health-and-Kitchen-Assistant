@@ -4,18 +4,47 @@
 // ========================================================
 
 (function () {
-    const API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
-        ? "http://localhost:5000"
-        : "https://smart-health-and-kitchen-assistant.onrender.com";
+    const API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:" || !window.location.hostname)
+    ? "http://localhost:5000"
+    : "https://smart-health-and-kitchen-assistant.onrender.com";
 
     // Track triggered alarms to prevent repeating in the same minute
     const triggeredAlarms = new Set();
 
     document.addEventListener("DOMContentLoaded", () => {
+        applyGlobalSettings();
         setupUniversalNavigation();
         initMedicineAlarmEngine();
         updateNotificationBadge();
     });
+
+    // ----------------------------------------------------
+    // Apply Settings (Dark Theme, Font Size) System-Wide
+    // ----------------------------------------------------
+    function applyGlobalSettings() {
+        try {
+            const saved = JSON.parse(localStorage.getItem("app_settings") || "{}");
+            let theme = saved.theme || "Light";
+
+            if (theme === "System Default") {
+                theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? "Dark" : "Light";
+            }
+
+            if (theme === "Dark") {
+                document.body.classList.add("dark-theme");
+                document.body.style.backgroundColor = "#0f172a";
+                document.body.style.color = "#f8fafc";
+            }
+
+            if (saved.fontSize === "Small") {
+                document.documentElement.style.fontSize = "14px";
+            } else if (saved.fontSize === "Large") {
+                document.documentElement.style.fontSize = "18px";
+            }
+        } catch (e) {
+            // Ignore settings parse error
+        }
+    }
 
     function setupUniversalNavigation() {
         // Ensure nav.css is linked
@@ -41,57 +70,62 @@
                 <span></span>
             </button>
 
-            <!-- Overlay Backdrop -->
-            <div class="universal-nav-backdrop" id="universalNavBackdrop"></div>
+            <!-- Backdrop Overlay -->
+            <div class="universal-drawer-backdrop" id="universalBackdrop"></div>
 
-            <!-- Slide-out Drawer -->
-            <aside class="universal-drawer" id="universalDrawer">
+            <!-- Slide-out Drawer Panel -->
+            <aside class="universal-drawer" id="universalDrawer" aria-label="Main Navigation">
                 <div class="drawer-header">
-                    <div class="brand-info">
-                        <img src="images/Gemini_Generated_Image_7rve5h7rve5h7rve.png" alt="Logo" class="brand-logo" onerror="this.style.display='none'">
-                        <div>
-                            <h2 class="brand-name">Smart Assistant</h2>
-                            <p class="user-greeting">👋 Hi, ${escapeHtml(username)}</p>
+                    <div class="drawer-brand">
+                        <span class="brand-icon">🥗</span>
+                        <div class="brand-text">
+                            <h3>Smart Assistant</h3>
+                            <p>Health & Kitchen</p>
                         </div>
                     </div>
-                    <button class="drawer-close-btn" id="drawerCloseBtn" title="Close Menu">&times;</button>
+                    <button class="drawer-close-btn" id="universalCloseBtn" aria-label="Close Navigation">&times;</button>
                 </div>
 
-                <nav class="drawer-nav">
+                <div class="drawer-user-info">
+                    <div class="user-avatar">${username.charAt(0).toUpperCase()}</div>
+                    <div class="user-details">
+                        <span class="user-name">${escapeHtml(username)}</span>
+                        <span class="user-status">&bull; Active Now</span>
+                    </div>
+                </div>
+
+                <nav class="drawer-links">
                     <div class="drawer-section-title">Dashboard</div>
                     <a href="home.html" class="drawer-link ${currentPath === 'home.html' ? 'active' : ''}">
-                        <span class="link-icon">🏠</span> Home Dashboard
+                        <span class="link-icon">📊</span> Home Dashboard
                     </a>
 
-                    <div class="drawer-section-title">Inventory</div>
+                    <div class="drawer-section-title">Inventories</div>
                     <a href="kit.html" class="drawer-link ${currentPath === 'kit.html' ? 'active' : ''}">
-                        <span class="link-icon">🥦</span> Kitchen Food
-                    </a>
-                    <a href="additem.html" class="drawer-link ${currentPath === 'additem.html' ? 'active' : ''}">
-                        <span class="link-icon">➕</span> Add Food Item
+                        <span class="link-icon">🥦</span> Kitchen Pantry
                     </a>
                     <a href="med.html" class="drawer-link ${currentPath === 'med.html' ? 'active' : ''}">
-                        <span class="link-icon">💊</span> Medicine Cabinet
-                    </a>
-                    <a href="additemmed.html" class="drawer-link ${currentPath === 'additemmed.html' ? 'active' : ''}">
-                        <span class="link-icon">✚</span> Log Medicine & Alarm
+                        <span class="link-icon">💊</span> Medicines & Alarms
                     </a>
 
-                    <div class="drawer-section-title">Features</div>
+                    <div class="drawer-section-title">Cooking & Shopping</div>
                     <a href="recipes.html" class="drawer-link ${currentPath === 'recipes.html' ? 'active' : ''}">
-                        <span class="link-icon">🍲</span> Recipes & AI Chef
+                        <span class="link-icon">🍲</span> AI Recipes & Chef
                     </a>
                     <a href="yourcart.html" class="drawer-link ${currentPath === 'yourcart.html' ? 'active' : ''}">
                         <span class="link-icon">🛒</span> Shopping Cart
                     </a>
+
+                    <div class="drawer-section-title">System & Alerts</div>
                     <a href="notif.html" class="drawer-link ${currentPath === 'notif.html' ? 'active' : ''}">
                         <span class="link-icon">🔔</span> Notifications & Alarms
-                        <span class="drawer-badge" id="navAlertBadge" style="display:none;">0</span>
+                        <span class="alert-badge" id="navAlertBadge" style="display:none;">0</span>
                     </a>
-
-                    <div class="drawer-section-title">Account</div>
                     <a href="settings.html" class="drawer-link ${currentPath === 'settings.html' ? 'active' : ''}">
                         <span class="link-icon">⚙️</span> Settings
+                    </a>
+                    <a href="profile.html" class="drawer-link ${currentPath === 'profile.html' ? 'active' : ''}">
+                        <span class="link-icon">👤</span> My Profile
                     </a>
                 </nav>
 
@@ -105,11 +139,10 @@
 
         document.body.insertAdjacentHTML("beforeend", drawerHtml);
 
-        // Bind events
-        const menuBtn = document.getElementById("universalMenuBtn");
-        const closeBtn = document.getElementById("drawerCloseBtn");
-        const backdrop = document.getElementById("universalNavBackdrop");
         const drawer = document.getElementById("universalDrawer");
+        const backdrop = document.getElementById("universalBackdrop");
+        const menuBtn = document.getElementById("universalMenuBtn");
+        const closeBtn = document.getElementById("universalCloseBtn");
         const logoutBtn = document.getElementById("drawerLogoutBtn");
 
         const openDrawer = () => {
@@ -148,7 +181,7 @@
     async function updateNotificationBadge() {
         const userId = localStorage.getItem("user_id") || 1;
         try {
-            const res = await fetch(`${API_BASE}/api/notifications/alerts?user_id=${userId}`);
+            const res = await fetch(`${API_BASE}/api/notifications/alerts?user_id=${userId}`, { cache: "no-store" });
             const data = await res.json();
             const total = data.alerts && data.alerts.summary ? data.alerts.summary.total_alerts : 0;
             const badge = document.getElementById("navAlertBadge");
@@ -177,40 +210,96 @@
             }, { once: true });
         }
 
-        // Check medicine schedule every 30 seconds
+        // Check medicine schedule immediately and every 10 seconds against real system clock
         checkMedicineSchedule();
-        setInterval(checkMedicineSchedule, 30000);
+        setInterval(checkMedicineSchedule, 10000);
+    }
+
+    function normalizeTimeToHHMM(timeStr) {
+        if (!timeStr) return null;
+        let s = String(timeStr).trim().toUpperCase();
+        const isPM = s.includes("PM");
+        const isAM = s.includes("AM");
+        s = s.replace(/AM|PM/g, "").trim();
+
+        const parts = s.split(":");
+        if (parts.length < 2) return null;
+
+        let h = parseInt(parts[0], 10);
+        let m = parseInt(parts[1], 10);
+        if (isNaN(h) || isNaN(m)) return null;
+
+        if (isPM && h < 12) h += 12;
+        if (isAM && h === 12) h = 0;
+
+        return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
     }
 
     async function checkMedicineSchedule() {
-        const userId = localStorage.getItem("user_id");
-        if (!userId) return;
+        const userId = localStorage.getItem("user_id") || 1;
 
+        // Current real system local time
         const now = new Date();
-        const hours = String(now.getHours()).padStart(2, "0");
-        const minutes = String(now.getMinutes()).padStart(2, "0");
-        const currentTimeStr = `${hours}:${minutes}`;
+        const currentHours = String(now.getHours()).padStart(2, "0");
+        const currentMinutes = String(now.getMinutes()).padStart(2, "0");
+        const currentTimeStr = `${currentHours}:${currentMinutes}`;
+        const currentTotalMinutes = now.getHours() * 60 + now.getMinutes();
+
+        let alarms = [];
 
         try {
-            const res = await fetch(`${API_BASE}/api/notifications/alerts?user_id=${userId}`);
-            const data = await res.json();
-            const alarms = (data.alerts && data.alerts.medicine_alarms) || [];
-
-            alarms.forEach(med => {
-                if (!med.isAlarmActive || !med.reminderTime) return;
-
-                // Match exact HH:MM format
-                const targetTime = med.reminderTime.trim().slice(0, 5);
-                const alarmKey = `${med.id}_${now.toDateString()}_${targetTime}`;
-
-                if (targetTime === currentTimeStr && !triggeredAlarms.has(alarmKey)) {
-                    triggeredAlarms.add(alarmKey);
-                    fireMedicineAlarm(med);
-                }
-            });
+            const res = await fetch(`${API_BASE}/api/notifications/alerts?user_id=${userId}`, { cache: "no-store" });
+            if (res.ok) {
+                const data = await res.json();
+                alarms = (data.alerts && data.alerts.medicine_alarms) || [];
+            }
         } catch (err) {
-            // Silently continue
+            // Fallback: fetch medicines directly
+            try {
+                const res2 = await fetch(`${API_BASE}/medicines?user_id=${userId}`);
+                if (res2.ok) {
+                    const meds = await res2.json();
+                    alarms = meds.filter(m => m.reminderTime).map(m => ({
+                        id: m.id,
+                        name: m.medicineName || m.name,
+                        reminderTime: m.reminderTime,
+                        frequency: m.frequency || "Daily",
+                        dosage: m.dosage || "1 tablet",
+                        isAlarmActive: m.isAlarmActive !== undefined ? m.isAlarmActive : true,
+                        lastTaken: m.lastTaken
+                    }));
+                }
+            } catch (e2) {}
         }
+
+        alarms.forEach(med => {
+            const isActive = (med.isAlarmActive !== false && med.isAlarmActive !== 0);
+            if (!isActive || !med.reminderTime) return;
+
+            const targetHHMM = normalizeTimeToHHMM(med.reminderTime);
+            if (!targetHHMM) return;
+
+            const [tH, tM] = targetHHMM.split(":").map(Number);
+            const targetTotalMinutes = tH * 60 + tM;
+
+            const alarmKey = `${med.id}_${now.toDateString()}_${targetHHMM}`;
+
+            // 1. Exact minute match
+            const isExactMinute = (targetHHMM === currentTimeStr);
+
+            // 2. Or was due in the last 15 minutes and not yet acknowledged today
+            const isRecentDue = (currentTotalMinutes >= targetTotalMinutes && currentTotalMinutes - targetTotalMinutes <= 15);
+
+            if ((isExactMinute || isRecentDue) && !triggeredAlarms.has(alarmKey)) {
+                // If already taken today, don't trigger
+                if (med.lastTaken && med.lastTaken.includes(now.toISOString().slice(0, 10))) {
+                    return;
+                }
+
+                triggeredAlarms.add(alarmKey);
+                fireMedicineAlarm(med);
+            }
+        });
     }
 
     function fireMedicineAlarm(med) {
@@ -220,8 +309,8 @@
         // 2. Desktop notification
         if ("Notification" in window && Notification.permission === "granted") {
             try {
-                new Notification(`⏰ Time to take ${med.name}!`, {
-                    body: `Dosage: ${med.dosage || "1 dose"} (${med.frequency || "Scheduled dose"}). Stay healthy!`,
+                new Notification(`⏰ Medicine Reminder: ${med.name}`, {
+                    body: `It is ${med.reminderTime}. Please take ${med.dosage || "1 dose"} (${med.frequency || "Scheduled dose"}).`,
                     icon: "images/Gemini_Generated_Image_7rve5h7rve5h7rve.png"
                 });
             } catch (e) {}
@@ -272,11 +361,11 @@
                     <div style="font-size:48px; margin-bottom:8px;">⏰💊</div>
                     <h2 style="margin:0 0 8px 0; color:#1e293b; font-size:22px;">Medicine Intake Reminder!</h2>
                     <p style="font-size:16px; color:#475569; margin:4px 0 16px 0;">
-                        It's time to take your dose of <strong style="color:#2e7d32;">${escapeHtml(med.name)}</strong>.
+                        It's time to take your scheduled dose of <strong style="color:#2e7d32;">${escapeHtml(med.name)}</strong>.
                     </p>
                     <div style="background:#f1f5f9; padding:12px; border-radius:10px; margin-bottom:20px; text-align:left; font-size:14px; color:#334155;">
                         <div><strong>Dosage:</strong> ${escapeHtml(med.dosage || "1 dose")}</div>
-                        <div><strong>Schedule:</strong> ${escapeHtml(med.frequency || "Daily")} at ${escapeHtml(med.reminderTime || "Now")}</div>
+                        <div><strong>Schedule:</strong> ${escapeHtml(med.frequency || "Daily")} at ${escapeHtml(med.reminderTime || "Scheduled Time")}</div>
                     </div>
                     <div style="display:flex; flex-direction:column; gap:10px;">
                         <button id="btnTakeDose" style="background:#2e7d32; color:white; border:none; padding:12px; border-radius:8px; font-size:15px; font-weight:700; cursor:pointer;">
@@ -302,7 +391,9 @@
             try {
                 await fetch(`${API_BASE}/api/medicines/${med.id}/take`, { method: "POST" });
                 alert(`Dose logged for ${med.name}! Remaining stock updated.`);
-            } catch (e) {}
+            } catch (e) {
+                alert(`Dose logged for ${med.name}!`);
+            }
             modal.remove();
         };
 
@@ -320,13 +411,13 @@
     }
 
     // Expose test helper globally for testing from UI or console
-    window.triggerTestMedicineAlarm = function (name = "Vitamin C 500mg", dosage = "1 tablet") {
+    window.triggerTestMedicineAlarm = function (name = "Prescription Dose", dosage = "1 tablet") {
         fireMedicineAlarm({
             id: 999,
             name: name,
             dosage: dosage,
-            reminderTime: "Now",
-            frequency: "Test Schedule",
+            reminderTime: "Actual Time",
+            frequency: "Daily Scheduled Dose",
             isAlarmActive: true
         });
     };

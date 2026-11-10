@@ -1,16 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notifications</title>
-
-    <link rel="stylesheet" href="notifications.css">
-
-    <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"> -->
     <title>Smart Health and Kitchen Assistant</title>
-    <link rel = "icon" href = "images/Gemini_Generated_Image_7rve5h7rve5h7rve.png">
+    <link rel="icon" href="images/Gemini_Generated_Image_7rve5h7rve5h7rve.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="css/notif.css">
     <link rel="stylesheet" href="css/nav.css">
 </head>
@@ -18,125 +13,59 @@
 <body>
 
 <header class="top-navbar">
-
     <div class="logo">
         <i class="fa-solid fa-bell"></i>
-        Notifications
+        Notifications & Alarms
     </div>
-
-    <button class="mark-btn">
-        Mark All as Read
-    </button>
-
+    <div style="display:flex; gap:8px;">
+        <button id="testAlarmBtn" style="background:#6366f1; color:white; border:none; padding:8px 14px; border-radius:6px; font-weight:600; cursor:pointer;" onclick="if(window.triggerTestMedicineAlarm){window.triggerTestMedicineAlarm('Prescription Dose', '1 tablet');}">
+            🔊 Test Alarm
+        </button>
+        <button class="mark-btn" style="background:#2e7d32; color:white; border:none; padding:8px 14px; border-radius:6px; font-weight:600; cursor:pointer;">
+            📧 Send Alert Digest
+        </button>
+    </div>
 </header>
 
 <main>
-
     <!-- Summary -->
-
     <section class="summary">
-
         <div class="card urgent">
             <i class="fa-solid fa-triangle-exclamation"></i>
-            <h2>3</h2>
-            <p>Urgent Alerts</p>
+            <h2>0</h2>
+            <p>Expired Items</p>
         </div>
 
         <div class="card warning">
             <i class="fa-solid fa-clock"></i>
-            <h2>5</h2>
+            <h2>0</h2>
             <p>Expiring Soon</p>
         </div>
 
         <div class="card info">
             <i class="fa-solid fa-cart-shopping"></i>
-            <h2>4</h2>
-            <p>Refill Reminders</p>
+            <h2>0</h2>
+            <p>Low Stock</p>
         </div>
 
+        <div class="card" id="medAlarmCard" style="background:#eef2ff; border-left:4px solid #6366f1;">
+            <i class="fa-solid fa-bell" style="color:#6366f1; font-size:24px;"></i>
+            <h2 style="color:#4338ca;">0</h2>
+            <p style="color:#475569;">Medicine Alarms</p>
+        </div>
     </section>
 
-    <!-- Notifications -->
-
+    <!-- Real Inventory Notifications List -->
     <section class="notification-list">
-
-        <h2>Recent Notifications</h2>
-
-        <div class="notification urgent">
-
-            <div class="icon">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-            </div>
-
-            <div class="content">
-                <h3>Milk expires tomorrow</h3>
-                <p>Please consume it soon.</p>
-                <span>2 minutes ago</span>
-            </div>
-
+        <h2>Active Alerts & Reminders</h2>
+        <div id="notifLoading" style="text-align:center; padding:40px; color:#64748b;">
+            <i class="fa-solid fa-spinner fa-spin" style="font-size:24px; margin-bottom:10px; display:block;"></i>
+            Checking kitchen inventory, medicine stock, and scheduled alarms...
         </div>
-
-        <div class="notification warning">
-
-            <div class="icon">
-                <i class="fa-solid fa-pills"></i>
-            </div>
-
-            <div class="content">
-                <h3>Paracetamol stock is low</h3>
-                <p>Only 2 tablets remaining.</p>
-                <span>10 minutes ago</span>
-            </div>
-
-        </div>
-
-        <div class="notification info">
-
-            <div class="icon">
-                <i class="fa-solid fa-utensils"></i>
-            </div>
-
-            <div class="content">
-                <h3>Recipe Recommendation</h3>
-                <p>You have enough ingredients for Vegetable Fried Rice.</p>
-                <span>Today</span>
-            </div>
-
-        </div>
-
-        <div class="notification success">
-
-            <div class="icon">
-                <i class="fa-solid fa-check"></i>
-            </div>
-
-            <div class="content">
-                <h3>Medicine Taken</h3>
-                <p>Vitamin C marked as completed.</p>
-                <span>Today</span>
-            </div>
-
-        </div>
-
-        <div class="notification reminder">
-
-            <div class="icon">
-                <i class="fa-solid fa-bell"></i>
-            </div>
-
-            <div class="content">
-                <h3>Medicine Reminder</h3>
-                <p>Time to take your Blood Pressure tablet.</p>
-                <span>8:00 AM</span>
-            </div>
-
-        </div>
-
     </section>
-
 </main>
 
-    <script src="javascript/notif.js"></script>
-    <script src="javascript/nav.js"></script>
+<script src="javascript/notif.js"></script>
+<script src="javascript/nav.js"></script>
 </body>
 </html>

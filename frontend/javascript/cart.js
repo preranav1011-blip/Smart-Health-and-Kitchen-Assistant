@@ -1,4 +1,6 @@
-﻿const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:5000' : 'https://smart-health-and-kitchen-assistant.onrender.com';
+﻿const API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:" || !window.location.hostname)
+    ? "http://localhost:5000"
+    : "https://smart-health-and-kitchen-assistant.onrender.com";
 const cartContainer = document.getElementById("cart-items");
 let purchasedCount = 0;
 

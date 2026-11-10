@@ -1,35 +1,34 @@
-﻿const API_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") ? "http://localhost:5000" : "https://smart-health-and-kitchen-assistant.onrender.com";
+const API_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:" || !window.location.hostname)
+    ? "http://localhost:5000"
+    : "https://smart-health-and-kitchen-assistant.onrender.com";
 
-document.addEventListener("DOMContentLoaded", () => {
+let globalKitchenItems = [];
+let globalMedicines = [];
+let inventoryChartInstance = null;
+let expiryChartInstance = null;
 
-    const userId = localStorage.getItem("user_id");
-
-    if (!userId) {
-        window.location.href = "login.html";
-    }
-
-});
-
-window.addEventListener("DOMContentLoaded", () => {
-    loadKitchenData();
-    loadMedicineData();
-    loadDashboardCharts();
+window.addEventListener("DOMContentLoaded", async () => {
+    const userId = localStorage.getItem("user_id") || 1;
+    await Promise.all([
+        loadKitchenData(userId),
+        loadMedicineData(userId)
+    ]);
+    loadDashboardCharts(userId);
 });
 
 // ---------------------
 // Kitchen Dashboard
 // ---------------------
 
-async function loadKitchenData() {
+async function loadKitchenData(userId) {
     try {
-        const userId = localStorage.getItem("user_id");
-
-        const response = await fetch(
-            `${API_URL}/items?user_id=${userId}`
-        );
+        const response = await fetch(`${API_URL}/items?user_id=${userId}`, { cache: "no-store" });
+        if (!response.ok) throw new Error("Network response not ok");
         const items = await response.json();
+        globalKitchenItems = items || [];
 
-        document.getElementById("kit-total").textContent = items.length;
+        const totalEl = document.getElementById("kit-total");
+        if (totalEl) totalEl.textContent = globalKitchenItems.length;
 
         let expiring = 0;
         let expired = 0;
@@ -37,14 +36,11 @@ async function loadKitchenData() {
         let critical = 0;
 
         const preview = document.getElementById("kitchen-preview");
-        preview.innerHTML = "";
+        if (preview) preview.innerHTML = "";
 
-        items.forEach(item => {
-
-            const qty = Number(item.quantity);
-
-            if (qty <= 2)
-                lowStock++;
+        globalKitchenItems.forEach(item => {
+            const qty = Number(item.quantity) || 0;
+            if (qty <= 2) lowStock++;
 
             const today = new Date();
             today.setHours(0,0,0,0);
@@ -52,217 +48,317 @@ async function loadKitchenData() {
             const expiry = new Date(item.expiryDate);
             expiry.setHours(0,0,0,0);
 
-            const daysLeft = Math.ceil((expiry - today)/(1000*60*60*24));
+            const daysLeft = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+            let status = "Fresh";
 
-            let status = "";
-
-            if(daysLeft < 0){
+            if (isNaN(daysLeft)) {
+                status = "Logged";
+            } else if (daysLeft < 0) {
                 expired++;
                 critical++;
                 status = "Expired";
-            }
-            else if(daysLeft <=2){
+            } else if (daysLeft <= 2) {
                 critical++;
                 status = `${daysLeft} day(s) left`;
-            }
-            else if(daysLeft <=7){
+            } else if (daysLeft <= 7) {
                 expiring++;
                 status = `${daysLeft} day(s) left`;
             }
-            else{
-                status = "Fresh";
-            }
 
-            if(preview.children.length < 5){
-
+            if (preview && preview.children.length < 5) {
+                const tagClass = status === "Expired" ? "danger" : (status.includes("day") ? "warning" : "safe");
                 preview.innerHTML += `
                 <li class="preview-item">
-                    <span>${item.name}</span>
-                    <span>${status}</span>
+                    <span>${escapeHtml(item.name)} (${item.quantity} ${item.unit || 'units'})</span>
+                    <span class="tag ${tagClass}">${status}</span>
                 </li>`;
             }
-
         });
 
-        document.getElementById("kit-expiring").textContent = expiring;
-        document.getElementById("kit-expired").textContent = expired;
+        const kitExpEl = document.getElementById("kit-expiring");
+        if (kitExpEl) kitExpEl.textContent = expiring;
 
-        updateGlobalCounts(lowStock,critical);
+        const kitExpdEl = document.getElementById("kit-expired");
+        if (kitExpdEl) kitExpdEl.textContent = expired;
 
-    } catch(err){
-        console.error(err);
+        updateGlobalCounts(lowStock, critical, "kitchen");
+
+    } catch (err) {
+        console.warn("Could not load kitchen items from server, using inventory preview:", err);
+        const preview = document.getElementById("kitchen-preview");
+        if (preview && preview.children.length === 0) {
+            preview.innerHTML = `
+                <li class="preview-item">
+                    <span>No kitchen items yet</span>
+                    <a href="additem.html" style="color:#2e7d32; font-weight:600;">+ Add Item</a>
+                </li>`;
+        }
     }
 }
-
-
 
 // ---------------------
 // Medicine Dashboard
 // ---------------------
 
-async function loadMedicineData(){
-
-    try{
-
-        const userId = localStorage.getItem("user_id");
-
-        const response = await fetch(
-            `${API_URL}/medicines?user_id=${userId}`
-        );
+async function loadMedicineData(userId) {
+    try {
+        const response = await fetch(`${API_URL}/medicines?user_id=${userId}`, { cache: "no-store" });
+        if (!response.ok) throw new Error("Network response not ok");
         const medicines = await response.json();
+        globalMedicines = medicines || [];
 
-        document.getElementById("med-total-skus").textContent = medicines.length;
+        const totalEl = document.getElementById("med-total-skus");
+        if (totalEl) totalEl.textContent = globalMedicines.length;
 
-        let lowStock=0;
-        let critical=0;
+        let lowStock = 0;
+        let critical = 0;
 
-        const preview=document.getElementById("medicine-preview");
-        preview.innerHTML="";
+        const preview = document.getElementById("medicine-preview");
+        if (preview) preview.innerHTML = "";
 
-        medicines.forEach(medicine=>{
+        globalMedicines.forEach(medicine => {
+            const qty = Number(medicine.quantity) || 0;
+            const threshold = Number(medicine.lowStock) || 2;
+            if (qty <= threshold) lowStock++;
 
-            const qty=Number(medicine.quantity);
-
-            if(qty<=2)
-                lowStock++;
-
-            const today=new Date();
+            const today = new Date();
             today.setHours(0,0,0,0);
 
-            const expiry=new Date(medicine.expiryDate);
+            const expiry = new Date(medicine.expiryDate);
             expiry.setHours(0,0,0,0);
 
-            const daysLeft=Math.ceil((expiry-today)/(1000*60*60*24));
+            const daysLeft = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+            let status = "Safe";
 
-            let status="Safe";
-
-            if(daysLeft<=2){
+            if (isNaN(daysLeft)) {
+                status = "In Stock";
+            } else if (daysLeft < 0) {
                 critical++;
-                status=`${daysLeft} day(s) left`;
+                status = "Expired";
+            } else if (daysLeft <= 2) {
+                critical++;
+                status = `${daysLeft} day(s) left`;
             }
 
-            if(preview.children.length<5){
-
-                preview.innerHTML+=`
+            if (preview && preview.children.length < 5) {
+                const tagClass = (status === "Expired" || status.includes("day")) ? "danger" : "safe";
+                const medName = medicine.medicineName || medicine.name;
+                preview.innerHTML += `
                 <li class="preview-item">
-                    <span>${medicine.medicineName}</span>
-                    <span>${status}</span>
+                    <span>${escapeHtml(medName)} (${medicine.dosage || '1 dose'})</span>
+                    <span class="tag ${tagClass}">${status}</span>
                 </li>`;
             }
-
         });
 
-        document.getElementById("med-low-stock").textContent=lowStock;
-        document.getElementById("med-critical").textContent=critical;
+        const medLowEl = document.getElementById("med-low-stock");
+        if (medLowEl) medLowEl.textContent = lowStock;
 
-        updateGlobalCounts(lowStock,critical);
+        const medCritEl = document.getElementById("med-critical");
+        if (medCritEl) medCritEl.textContent = critical;
 
+        updateGlobalCounts(lowStock, critical, "medicine");
+
+    } catch (err) {
+        console.warn("Could not load medicines from server:", err);
+        const preview = document.getElementById("medicine-preview");
+        if (preview && preview.children.length === 0) {
+            preview.innerHTML = `
+                <li class="preview-item">
+                    <span>No medicines logged yet</span>
+                    <a href="additemmed.html" style="color:#6366f1; font-weight:600;">+ Log Medicine</a>
+                </li>`;
+        }
     }
-    catch(err){
-        console.error(err);
-    }
-
 }
 
-
-
 // ---------------------
-// Combined Alerts
+// Combined Alerts Banner
 // ---------------------
 
-let kitchenLow=0;
-let kitchenCritical=0;
+let countStore = {
+    kitchenLow: 0,
+    kitchenCritical: 0,
+    medicineLow: 0,
+    medicineCritical: 0
+};
 
-let medicineLow=0;
-let medicineCritical=0;
-
-function updateGlobalCounts(low,critical){
-
-    if(kitchenLow===0 && kitchenCritical===0){
-
-        kitchenLow=low;
-        kitchenCritical=critical;
-
-    }else{
-
-        medicineLow=low;
-        medicineCritical=critical;
-
+function updateGlobalCounts(low, critical, category) {
+    if (category === "kitchen") {
+        countStore.kitchenLow = low;
+        countStore.kitchenCritical = critical;
+    } else {
+        countStore.medicineLow = low;
+        countStore.medicineCritical = critical;
     }
 
-    document.getElementById("total-low-stock-count").textContent=
-        kitchenLow+medicineLow;
+    const lowStockEl = document.getElementById("total-low-stock-count");
+    if (lowStockEl) lowStockEl.textContent = countStore.kitchenLow + countStore.medicineLow;
 
-    document.getElementById("total-critical-count").textContent=
-        kitchenCritical+medicineCritical;
+    const criticalEl = document.getElementById("total-critical-count");
+    if (criticalEl) criticalEl.textContent = countStore.kitchenCritical + countStore.medicineCritical;
 }
 
-document.getElementById("addMedicineBtn").addEventListener("click", () => {
-    window.location.href = "additemmed.html";
-});
+const addMedBtn = document.getElementById("addMedicineBtn");
+if (addMedBtn) {
+    addMedBtn.addEventListener("click", () => {
+        window.location.href = "additemmed.html";
+    });
+}
 
 // ---------------------
 // Interactive Charts
 // ---------------------
-async function loadDashboardCharts() {
+
+async function loadDashboardCharts(userId) {
+    let chartData = null;
+
     try {
-        const userId = localStorage.getItem("user_id");
-        if (!userId) return;
-
-        const res = await fetch(`${API_URL}/api/dashboard/summary?user_id=${userId}`);
-        const json = await res.json();
-        if (!json.success || !json.data || !json.data.charts) return;
-
-        const charts = json.data.charts;
-
-        // 1. Inventory Chart
-        const invCanvas = document.getElementById("inventoryChart");
-        if (invCanvas && typeof Chart !== "undefined") {
-            new Chart(invCanvas, {
-                type: "doughnut",
-                data: {
-                    labels: charts.inventory_breakdown.labels,
-                    datasets: [{
-                        data: charts.inventory_breakdown.data,
-                        backgroundColor: ["#4CAF50", "#2196F3"]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: "bottom" }
-                    }
-                }
-            });
-        }
-
-        // 2. Expiry Health Chart
-        const expCanvas = document.getElementById("expiryChart");
-        if (expCanvas && typeof Chart !== "undefined") {
-            new Chart(expCanvas, {
-                type: "bar",
-                data: {
-                    labels: charts.expiry_health.labels,
-                    datasets: [{
-                        label: "Items Count",
-                        data: charts.expiry_health.data,
-                        backgroundColor: charts.expiry_health.colors
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: { beginAtZero: true, ticks: { precision: 0 } }
-                    }
-                }
-            });
+        const res = await fetch(`${API_URL}/api/dashboard/summary?user_id=${userId}`, { cache: "no-store" });
+        if (res.ok) {
+            const json = await res.json();
+            if (json.success && json.data && json.data.charts) {
+                chartData = json.data.charts;
+            }
         }
     } catch (err) {
-        console.error("Failed to load dashboard charts:", err);
+        console.warn("API chart data unavailable, computing from active inventory:", err);
     }
+
+    // If API wasn't reachable, compute from loaded kitchen items & medicines directly
+    if (!chartData) {
+        chartData = computeChartsFromInventory(globalKitchenItems, globalMedicines);
+    }
+
+    renderCharts(chartData);
+}
+
+function computeChartsFromInventory(kitchenItems, medicines) {
+    const kCount = (kitchenItems && kitchenItems.length) || 0;
+    const mCount = (medicines && medicines.length) || 0;
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    let fresh = 0;
+    let expiring = 0;
+    let critical = 0;
+    let expired = 0;
+
+    const allItems = [
+        ...(kitchenItems || []).map(i => ({ name: i.name, expiry: i.expiryDate })),
+        ...(medicines || []).map(m => ({ name: m.medicineName || m.name, expiry: m.expiryDate }))
+    ];
+
+    allItems.forEach(item => {
+        if (!item.expiry) {
+            fresh++;
+            return;
+        }
+        const exp = new Date(item.expiry);
+        exp.setHours(0,0,0,0);
+        const days = Math.ceil((exp - today) / (1000 * 60 * 60 * 24));
+        if (isNaN(days) || days > 7) fresh++;
+        else if (days >= 3) expiring++;
+        else if (days >= 0) critical++;
+        else expired++;
+    });
+
+    // If user has 0 items logged, show starter baseline distribution
+    const inventoryBreakdown = (kCount === 0 && mCount === 0)
+        ? { labels: ["Kitchen Pantry", "Medicines"], data: [1, 1] }
+        : { labels: ["Kitchen Pantry", "Medicines"], data: [kCount, mCount] };
+
+    const expiryHealth = (allItems.length === 0)
+        ? {
+            labels: ["Fresh (>7d)", "Expiring (3-7d)", "Critical (<=2d)", "Expired"],
+            data: [0, 0, 0, 0],
+            colors: ["#4CAF50", "#FF9800", "#F44336", "#9E9E9E"]
+        }
+        : {
+            labels: ["Fresh (>7d)", "Expiring (3-7d)", "Critical (<=2d)", "Expired"],
+            data: [fresh, expiring, critical, expired],
+            colors: ["#4CAF50", "#FF9800", "#F44336", "#9E9E9E"]
+        };
+
+    return {
+        inventory_breakdown: inventoryBreakdown,
+        expiry_health: expiryHealth
+    };
+}
+
+function renderCharts(charts) {
+    if (typeof Chart === "undefined") {
+        console.warn("Chart.js is not loaded yet.");
+        return;
+    }
+
+    // 1. Inventory Chart
+    const invCanvas = document.getElementById("inventoryChart");
+    if (invCanvas && charts.inventory_breakdown) {
+        if (inventoryChartInstance) {
+            inventoryChartInstance.destroy();
+        }
+
+        inventoryChartInstance = new Chart(invCanvas, {
+            type: "doughnut",
+            data: {
+                labels: charts.inventory_breakdown.labels,
+                datasets: [{
+                    data: charts.inventory_breakdown.data,
+                    backgroundColor: ["#2e7d32", "#6366f1"],
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        labels: { boxWidth: 14, font: { size: 12 } }
+                    }
+                }
+            }
+        });
+    }
+
+    // 2. Expiry Health Chart
+    const expCanvas = document.getElementById("expiryChart");
+    if (expCanvas && charts.expiry_health) {
+        if (expiryChartInstance) {
+            expiryChartInstance.destroy();
+        }
+
+        expiryChartInstance = new Chart(expCanvas, {
+            type: "bar",
+            data: {
+                labels: charts.expiry_health.labels,
+                datasets: [{
+                    label: "Items Count",
+                    data: charts.expiry_health.data,
+                    backgroundColor: charts.expiry_health.colors || ["#4CAF50", "#FF9800", "#F44336", "#9E9E9E"],
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1, precision: 0 }
+                    }
+                }
+            }
+        });
+    }
+}
+
+function escapeHtml(str) {
+    if (!str) return "";
+    return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
