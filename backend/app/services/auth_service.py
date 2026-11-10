@@ -41,3 +41,19 @@ class AuthService:
         user.set_password(new_password)
         db.session.commit()
         return True, "Password updated successfully"
+
+    @staticmethod
+    def update_profile(user_id: int, name: str = None, email: str = None):
+        user = db.session.get(User, user_id)
+        if not user:
+            return None, "User not found"
+        if name and name.strip():
+            user.name = name.strip()
+        if email and email.strip():
+            # Check unique email
+            existing = User.query.filter(User.email == email.strip(), User.id != user_id).first()
+            if existing:
+                return None, "Email is already taken"
+            user.email = email.strip()
+        db.session.commit()
+        return user, None

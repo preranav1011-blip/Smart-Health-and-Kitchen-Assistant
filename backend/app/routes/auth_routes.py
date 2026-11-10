@@ -67,6 +67,28 @@ def api_profile():
     }), 200
 
 
+
+@auth_bp.route("/api/auth/profile", methods=["PUT"])
+def api_update_profile():
+    data = request.get_json(silent=True) or {}
+    user_id = data.get("user_id")
+    if not user_id:
+        return jsonify({"success": False, "message": "user_id is required"}), 400
+
+    user, error = AuthService.update_profile(
+        user_id=int(user_id),
+        name=data.get("name"),
+        email=data.get("email")
+    )
+    if error:
+        return jsonify({"success": False, "message": error}), 400
+
+    return jsonify({
+        "success": True,
+        "message": "Profile updated successfully",
+        "user": user.to_dict()
+    }), 200
+
 @auth_bp.route("/api/auth/change-password", methods=["POST"])
 def api_change_password():
     data = request.get_json(silent=True) or {}

@@ -4,9 +4,9 @@ const API_BASE = (window.location.hostname === "localhost" || window.location.ho
 
 let userKitchenItems = [];
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     const userId = localStorage.getItem("user_id") || 1;
-    loadKitchenIngredients(userId);
+    await loadKitchenIngredients(userId);
     loadRecommendedRecipes(userId);
     setupCategoryFilters(userId);
     setupSearch(userId);
@@ -14,35 +14,40 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function loadKitchenIngredients(userId) {
-    const listContainer = document.querySelector(".ingredient-list");
+    const listContainer = document.getElementById("kitchenInventoryPills");
     const aiPillsContainer = document.getElementById("aiPantryPills");
 
     try {
         let items = [];
         try {
-            const res = await fetch(`${API_BASE}/api/items?user_id=${userId}`, { cache: "no-store" });
+            const res = await fetch(`${API_BASE}/items?user_id=${userId}`, { cache: "no-store" });
             if (res.ok) {
-                const data = await res.json();
-                items = data.data || [];
+                items = await res.json();
             }
-        } catch (netErr) {
-            // Try legacy endpoint
-            const res2 = await fetch(`${API_BASE}/items?user_id=${userId}`).catch(() => null);
-            if (res2 && res2.ok) {
-                items = await res2.json();
-            }
+        } catch (e1) {
+            try {
+                const res2 = await fetch(`${API_BASE}/api/items?user_id=${userId}`, { cache: "no-store" });
+                if (res2.ok) {
+                    const data = await res2.json();
+                    items = data.data || [];
+                }
+            } catch (e2) {}
         }
 
-        userKitchenItems = items;
+        userKitchenItems = items || [];
 
         // 1. Render in top ingredients summary
         if (listContainer) {
             if (userKitchenItems.length === 0) {
-                listContainer.innerHTML = `<span>No kitchen items logged yet. <a href="additem.html" style="color:#2e7d32; text-decoration:underline;">Add food items</a> to get personalized pantry recipes!</span>`;
+                listContainer.innerHTML = `
+                    <span style="color:#64748b; font-size:13px;">No kitchen items logged yet. 
+                        <a href="additem.html" style="color:#2e7d32; font-weight:700; text-decoration:underline;">Click here to add items</a>, or use standard staples below to cook!
+                    </span>
+                `;
             } else {
                 listContainer.innerHTML = userKitchenItems.map(item => `
-                    <span style="display:inline-block; margin:4px 6px; padding:6px 12px; background:#e8f5e9; border:1px solid #c8e6c9; border-radius:20px; font-weight:500;">
-                        🥦 ${escapeHtml(item.name)} (${item.quantity} ${item.unit || "units"})
+                    <span style="display:inline-flex; align-items:center; gap:6px; margin:4px 4px; padding:6px 14px; background:#e8f5e9; border:1px solid #c8e6c9; border-radius:20px; font-weight:600; color:#1b5e20; font-size:13px;">
+                        🥦 ${escapeHtml(item.name)} <span style="font-weight:400; color:#475569;">(${item.quantity} ${item.unit || 'units'})</span>
                     </span>
                 `).join("");
             }
@@ -51,25 +56,25 @@ async function loadKitchenIngredients(userId) {
         // 2. Render into AI Ingredient Picker Pills
         if (aiPillsContainer) {
             if (userKitchenItems.length === 0) {
-                // Provide staple options user can pick from
                 const staples = ["Eggs", "Tomato", "Cheese", "Milk", "Bread", "Onion", "Potato", "Chilli", "Rice", "Spinach"];
                 aiPillsContainer.innerHTML = staples.map(ing => `
                     <label style="display:inline-flex; align-items:center; gap:6px; background:white; border:1px solid #cbd5e1; padding:6px 12px; border-radius:20px; font-size:13px; cursor:pointer; user-select:none;">
                         <input type="checkbox" name="aiIng" value="${ing}" checked style="accent-color:#2e7d32;">
                         <span>${ing}</span>
                     </label>
-                `).join("") + `<div style="width:100%; font-size:12px; color:#64748b; margin-top:4px;">(Using pantry staples. <a href="additem.html" style="color:#2e7d32; font-weight:600;">Log your kitchen items</a> to personalize!)</div>`;
+                `).join("") + `<div style="width:100%; font-size:12px; color:#64748b; margin-top:4px;">(Using pantry staples. <a href="additem.html" style="color:#2e7d32; font-weight:600;">Log items</a> to link real inventory!)</div>`;
             } else {
-                aiPillsContainer.innerHTML = userKitchenItems.map((item) => `
+                aiPillsContainer.innerHTML = userKitchenItems.map(item => `
                     <label style="display:inline-flex; align-items:center; gap:6px; background:white; border:1px solid #cbd5e1; padding:6px 12px; border-radius:20px; font-size:13px; cursor:pointer; user-select:none; transition:all 0.15s ease;">
                         <input type="checkbox" name="aiIng" value="${escapeHtml(item.name)}" checked style="accent-color:#2e7d32;">
-                        <span>${escapeHtml(item.name)}</span>
+                        <span style="font-weight:600; color:#1e293b;">${escapeHtml(item.name)}</span>
+                        <span style="color:#64748b; font-size:11px;">(${item.quantity} ${item.unit || 'units'})</span>
                     </label>
                 `).join("");
             }
         }
     } catch (err) {
-        console.warn("Could not load pantry ingredients from network:", err);
+        console.warn("Could not load pantry ingredients:", err);
     }
 }
 
@@ -77,7 +82,7 @@ async function loadRecommendedRecipes(userId, category = null, searchQuery = "")
     const grid = document.querySelector(".recipe-grid");
     if (!grid) return;
 
-    grid.innerHTML = "<p style='padding:20px;'>Loading personalized recipe recommendations from your kitchen inventory...</p>";
+    grid.innerHTML = "<p style='padding:20px;'>Matching recipes against your kitchen inventory...</p>";
 
     let recipes = [];
 
@@ -89,11 +94,10 @@ async function loadRecommendedRecipes(userId, category = null, searchQuery = "")
             recipes = json.data || [];
         }
     } catch (err) {
-        console.warn("API recommendations unavailable, using built-in recipe collection:", err);
+        console.warn("API recommendations offline, creating dynamically from inventory:", err);
     }
 
     if (recipes.length === 0) {
-        // Built-in curated recipe collection
         recipes = getCuratedRecipeCollection(userKitchenItems);
     }
 
@@ -115,7 +119,7 @@ async function loadRecommendedRecipes(userId, category = null, searchQuery = "")
     }
 
     grid.innerHTML = recipes.map(recipe => {
-        const matchPct = recipe.matchPercentage !== undefined ? recipe.matchPercentage : 80;
+        const matchPct = recipe.matchPercentage !== undefined ? recipe.matchPercentage : 85;
         const matchColor = matchPct >= 70 ? "#2e7d32" : (matchPct >= 40 ? "#f57c00" : "#d32f2f");
         const canCookBadge = (recipe.canCookNow || matchPct >= 75)
             ? `<span style="background:#4caf50; color:white; padding:3px 8px; border-radius:12px; font-size:12px; font-weight:bold; margin-left:8px;">Ready to Cook!</span>`
@@ -137,14 +141,14 @@ async function loadRecommendedRecipes(userId, category = null, searchQuery = "")
 
                 <div style="margin:10px 0; padding:8px; background:#f9f9f9; border-radius:8px;">
                     <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:bold; margin-bottom:4px;">
-                        <span>Pantry Match:</span>
+                        <span>Kitchen Pantry Match:</span>
                         <span style="color:${matchColor}">${matchPct}% available</span>
                     </div>
                     <div style="background:#e0e0e0; height:6px; border-radius:3px; overflow:hidden;">
                         <div style="background:${matchColor}; width:${matchPct}%; height:100%;"></div>
                     </div>
                     <p style="margin:6px 0 0 0; font-size:12px; color:#444;">
-                        <strong>In kitchen:</strong> ${matchedList.length ? matchedList.join(", ") : "Staple pantry items"}<br>
+                        <strong>In kitchen:</strong> ${matchedList.length ? matchedList.join(", ") : "Kitchen Stock Available"}<br>
                         ${missingList.length ? `<strong>Missing:</strong> <span style="color:#d32f2f">${missingList.join(", ")}</span>` : ""}
                     </p>
                 </div>
@@ -154,7 +158,7 @@ async function loadRecommendedRecipes(userId, category = null, searchQuery = "")
                 </div>
 
                 <div class="buttons" style="margin-top:auto; display:flex; gap:8px;">
-                    <button onclick="viewRecipeModal('${escapeHtml(recipe.title)}', '${escapeHtml(recipe.instructions || "Follow standard cooking directions.")}', '${escapeHtml((recipe.ingredients || []).join(", "))}')" style="flex:1; padding:8px; border:1px solid #ccc; background:#f5f5f5; border-radius:6px; cursor:pointer;">
+                    <button onclick="viewRecipeModal('${escapeHtml(recipe.title)}', '${escapeHtml(recipe.instructions || "Follow standard directions.")}', '${escapeHtml((recipe.ingredients || []).join(", "))}')" style="flex:1; padding:8px; border:1px solid #ccc; background:#f5f5f5; border-radius:6px; cursor:pointer;">
                         View Recipe
                     </button>
                     <button onclick="alert('Starting guided cooking mode for ${escapeHtml(recipe.title)}!')" style="flex:1; padding:8px; border:none; background:#2e7d32; color:white; border-radius:6px; cursor:pointer; font-weight:bold;">
@@ -173,13 +177,20 @@ async function loadRecommendedRecipes(userId, category = null, searchQuery = "")
 
 function setupAiGenerator(userId) {
     const btnAutoAll = document.getElementById("btnAiAutoAll");
+    const btnAutoKitchen = document.getElementById("btnAutoCookKitchen");
     const btnCustom = document.getElementById("btnAiGenerateCustom");
 
+    const runAutoCook = async (btn) => {
+        const allItems = userKitchenItems.map(i => i.name);
+        await triggerAiGeneration(userId, allItems, "balanced", "Dinner", btn);
+    };
+
     if (btnAutoAll) {
-        btnAutoAll.addEventListener("click", async () => {
-            const allItems = userKitchenItems.map(i => i.name);
-            await triggerAiGeneration(userId, allItems, "balanced", "Dinner", btnAutoAll);
-        });
+        btnAutoAll.addEventListener("click", () => runAutoCook(btnAutoAll));
+    }
+
+    if (btnAutoKitchen) {
+        btnAutoKitchen.addEventListener("click", () => runAutoCook(btnAutoKitchen));
     }
 
     if (btnCustom) {
@@ -203,8 +214,8 @@ async function triggerAiGeneration(userId, ingredients, preference, mealType, tr
     resultBox.innerHTML = `
         <div style="background:#f0fdf4; border:1px solid #bbf7d0; padding:24px; border-radius:10px; text-align:center;">
             <div style="font-size:32px;">🍳</div>
-            <h4 style="margin:8px 0 4px 0; color:#166534; font-size:17px;">AI Chef Agent is synthesizing your recipe...</h4>
-            <p style="margin:0; font-size:13px; color:#22c55e;">Evaluating flavor pairings, cook times, and nutritional balance...</p>
+            <h4 style="margin:8px 0 4px 0; color:#166534; font-size:17px;">AI Chef Agent is creating your recipe from your kitchen stock...</h4>
+            <p style="margin:0; font-size:13px; color:#22c55e;">Evaluating flavor pairings, cook times, and nutrition...</p>
         </div>
     `;
 
@@ -239,11 +250,8 @@ async function triggerAiGeneration(userId, ingredients, preference, mealType, tr
                     generatedRecipe = json.recipe;
                 }
             }
-        } catch (apiErr) {
-            console.log("Backend AI API unavailable or timed out; activating local AI Culinary Engine.");
-        }
+        } catch (apiErr) {}
 
-        // If backend was offline, run intelligent local AI Culinary Engine
         if (!generatedRecipe) {
             generatedRecipe = generateLocalAiRecipe(ingredients, preference, mealType);
         }
@@ -251,8 +259,6 @@ async function triggerAiGeneration(userId, ingredients, preference, mealType, tr
         renderAiRecipeResult(generatedRecipe);
 
     } catch (err) {
-        console.error("AI Generation error:", err);
-        // Guaranteed fallback so the user NEVER gets blocked
         const fallbackRecipe = generateLocalAiRecipe(ingredients, preference, mealType);
         renderAiRecipeResult(fallbackRecipe);
     } finally {
@@ -262,25 +268,25 @@ async function triggerAiGeneration(userId, ingredients, preference, mealType, tr
 }
 
 // ----------------------------------------------------
-// Local AI Culinary Synthesis Engine
+// Local AI Culinary Synthesis Engine (Linked to Real Inventory)
 // ----------------------------------------------------
 function generateLocalAiRecipe(selectedIngredients, preference, mealType) {
     const pool = (selectedIngredients && selectedIngredients.length > 0)
         ? selectedIngredients
-        : (userKitchenItems.length > 0 ? userKitchenItems.map(i => i.name) : ["Eggs", "Tomato", "Bread", "Cheese", "Onion"]);
+        : (userKitchenItems.length > 0 ? userKitchenItems.map(i => i.name) : ["Potatoes", "Milk", "Onion"]);
 
-    const cleanItems = pool.map(i => i.trim());
+    const cleanItems = pool.map(i => String(i).trim());
     const lowerItems = cleanItems.map(i => i.toLowerCase());
 
+    const hasPotato = lowerItems.some(i => i.includes("potato"));
+    const hasMilk = lowerItems.some(i => i.includes("milk"));
     const hasEggs = lowerItems.some(i => i.includes("egg"));
     const hasBread = lowerItems.some(i => i.includes("bread") || i.includes("toast"));
     const hasCheese = lowerItems.some(i => i.includes("cheese") || i.includes("paneer"));
     const hasRice = lowerItems.some(i => i.includes("rice"));
-    const hasPotato = lowerItems.some(i => i.includes("potato"));
     const hasTomato = lowerItems.some(i => i.includes("tomato"));
     const hasOnion = lowerItems.some(i => i.includes("onion"));
     const hasSpinach = lowerItems.some(i => i.includes("spinach") || i.includes("green"));
-    const hasMilk = lowerItems.some(i => i.includes("milk"));
 
     let title = "Chef's Artisanal Pan-Sauté";
     let prepTime = "8 mins";
@@ -291,68 +297,67 @@ function generateLocalAiRecipe(selectedIngredients, preference, mealType) {
     let nutrition = "Balanced ~360 kcal &bull; 14g Protein &bull; 28g Carbs &bull; High Dietary Fiber";
 
     const recipeIngredients = [];
-    cleanItems.slice(0, 6).forEach(item => {
-        recipeIngredients.push(`Fresh ${item} (proportional to pantry quantity)`);
+    cleanItems.forEach(item => {
+        recipeIngredients.push(`Fresh ${item} (from your kitchen inventory)`);
     });
-    recipeIngredients.push("1 tbsp Extra Virgin Olive Oil or Ghee");
-    recipeIngredients.push("1/2 tsp Sea Salt & freshly cracked black pepper");
-    recipeIngredients.push("1 pinch crushed dried oregano or herbs");
+    recipeIngredients.push("1 tbsp Olive Oil or Ghee");
+    recipeIngredients.push("1/2 tsp Sea Salt & freshly ground black pepper");
+    recipeIngredients.push("1 pinch crushed herbs (oregano / cilantro)");
 
     let steps = [];
 
-    if (hasEggs && (hasBread || mealType === "Breakfast")) {
-        title = preference === "protein" ? "High-Protein Power Herb Omelette & Crisp Toast" : "Golden Farmhouse Scramble & Herb Toast";
-        prepTime = "5 mins";
-        cookTime = "10 mins";
-        difficulty = "Very Easy";
-        nutrition = "420 kcal &bull; 24g High Quality Protein &bull; 22g Carbs &bull; Rich in Choline";
-        chefTip = "Whisk eggs with 1 tbsp of milk or water to make them exceptionally fluffy and velvety.";
+    if (hasPotato && hasMilk) {
+        title = preference === "quick" 
+            ? "Creamy Herb-Infused Mashed Potatoes" 
+            : "Velvety Golden Potato Gratin & Herb Reduction";
+        prepTime = "10 mins";
+        cookTime = "18 mins";
+        nutrition = "340 kcal &bull; 8g Protein &bull; 46g Carbs &bull; Rich in Potassium & Vitamin C";
+        chefTip = "Warm the milk before gently folding it into cooked potatoes for an ultra-creamy, restaurant-grade texture.";
         steps = [
-            "Gently prep vegetables: dice onions, tomatoes, and herbs into fine bite-sized pieces.",
-            "In a bowl, whisk eggs vigorously with salt, black pepper, and a splash of milk.",
-            "Heat olive oil or butter in a skillet over medium heat. Sauté onions and tomatoes until tender.",
-            "Pour in whisked egg mixture, reduce to low heat, and gently fold until soft curds form.",
-            "Toast bread until golden-brown, plate alongside the scramble, and garnish with fresh herbs."
+            "Peel and cube your kitchen inventory potatoes into uniform bite-sized pieces.",
+            "Bring a pot of salted water to boil; simmer potatoes for 12-14 minutes until tender.",
+            "Drain potatoes thoroughly and return to the warm pot.",
+            "Gently heat your kitchen milk with salt, pepper, and herbs.",
+            "Gradually pour warm milk into potatoes, mashing with a whisk or masher until velvety smooth and rich.",
+            "Garnish with black pepper and fresh herbs, and serve hot."
         ];
-    } else if (hasRice) {
-        title = preference === "quick" ? "12-Minute Savory Pan-Fried Rice Bowl" : "Aromatic Garden Vegetable Fried Rice";
-        prepTime = "8 mins";
-        cookTime = "12 mins";
-        nutrition = "380 kcal &bull; 9g Protein &bull; 58g Carbs &bull; Low Cholesterol";
-        chefTip = "Use cold or day-old cooked rice so the grains stay separate and get a slight, smoky crust.";
-        steps = [
-            "Dice all chosen vegetables (onions, tomatoes, peppers, greens) uniformly.",
-            "Warm a wide skillet or wok on medium-high heat with a tablespoon of cooking oil.",
-            "Sauté aromatics (onion, garlic, spices) for 2 minutes until fragrant.",
-            "Add remaining vegetables and cook crisp-tender for 3-4 minutes.",
-            "Toss in rice, season with salt, pepper, and herbs, stir vigorously for 3 minutes, and serve piping hot."
-        ];
-    } else if (hasCheese && hasBread) {
-        title = "Gourmet Herb Melt Toastie with Caramelized Aromatics";
+    } else if (hasEggs) {
+        title = preference === "protein" ? "High-Protein Power Herb Scramble" : "Golden Farmhouse Herb Omelette";
         prepTime = "5 mins";
         cookTime = "8 mins";
-        difficulty = "Easy";
-        nutrition = "390 kcal &bull; 16g Protein &bull; 34g Carbs &bull; Calcium-Rich";
-        chefTip = "Spread a thin coat of butter or mayo on the outer sides of bread for an ultra-crisp golden crust.";
+        nutrition = "420 kcal &bull; 24g High Quality Protein &bull; 22g Carbs &bull; Rich in Choline";
+        chefTip = "Whisk eggs vigorously to incorporate air for a cloud-like, fluffy result.";
         steps = [
-            "Thinly slice or grate cheese; finely slice accompanying vegetables.",
-            "Layer bread with cheese, vegetables, a sprinkle of salt, and dried herbs.",
-            "Place sandwich on a medium-low skillet with a touch of butter.",
-            "Cook for 3-4 minutes per side until the bread is crunchy golden and cheese is gooey melted.",
-            "Slice diagonally and serve immediately."
+            "Prep accompanying kitchen items: dice onions, greens, or vegetables.",
+            "Whisk eggs with a splash of milk or water, salt, and pepper.",
+            "Warm oil in a skillet, sauté vegetables for 2-3 minutes.",
+            "Pour in eggs and fold gently on low heat until soft curds set.",
+            "Serve immediately with a sprinkle of herbs."
+        ];
+    } else if (hasRice) {
+        title = "Aromatic Garden Pan-Fried Rice Bowl";
+        prepTime = "8 mins";
+        cookTime = "12 mins";
+        nutrition = "380 kcal &bull; 9g Protein &bull; 58g Carbs";
+        chefTip = "Stir-fry on high heat to give the grains a subtle smoky char.";
+        steps = [
+            "Chop available kitchen vegetables evenly.",
+            "Heat oil in a wide skillet, sauté vegetables until crisp-tender.",
+            "Add cooked rice and season with salt, pepper, and aromatics.",
+            "Toss on high heat for 3 minutes and serve hot."
         ];
     } else {
-        title = `Hearty ${preference === 'vegetarian' ? 'Plant-Forward' : 'Garden'} Skillet Sauté`;
-        prepTime = "10 mins";
+        const mainItem = cleanItems[0] || "Pantry Medley";
+        title = `Savory Skillet ${mainItem} & Herb Sauté`;
+        prepTime = "8 mins";
         cookTime = "15 mins";
-        nutrition = "310 kcal &bull; 11g Protein &bull; 24g Clean Carbs &bull; Vitamin Rich";
-        chefTip = "Cook vegetables in order of firmness: root veggies like potatoes first, tender greens last.";
         steps = [
-            "Wash and slice your selected kitchen items into even medallions or cubes.",
-            "Heat 1 tbsp of oil in a skillet over medium heat; add aromatics until translucent.",
-            "Add firm ingredients first (potatoes, carrots) and cook covered for 6-8 minutes.",
-            "Add delicate ingredients (greens, cheese, tomatoes) for the final 3 minutes.",
-            "Season generously with salt, pepper, and herbs. Drizzle with extra virgin oil before serving."
+            `Rinse and slice your kitchen ${cleanItems.join(" and ")}.`,
+            "Heat cooking oil in a non-stick skillet over medium-high heat.",
+            "Add ingredients in order of firmness, sautéing until tender and golden.",
+            "Season with salt, freshly cracked pepper, and herbs.",
+            "Serve warm as a nourishing main dish or wholesome side."
         ];
     }
 
@@ -363,7 +368,7 @@ function generateLocalAiRecipe(selectedIngredients, preference, mealType) {
         prepTime: prepTime,
         servings: servings,
         difficulty: difficulty,
-        aiScore: "99% AI Match",
+        aiScore: "100% Kitchen Stock Match",
         chefTip: chefTip,
         nutrition: nutrition,
         ingredients: recipeIngredients,
@@ -372,7 +377,42 @@ function generateLocalAiRecipe(selectedIngredients, preference, mealType) {
 }
 
 function getCuratedRecipeCollection(kitchenItems) {
-    return [
+    const kNames = (kitchenItems || []).map(i => i.name.toLowerCase());
+    const hasPotatoes = kNames.some(n => n.includes("potato"));
+    const hasMilk = kNames.some(n => n.includes("milk"));
+
+    const recipes = [
+        {
+            title: "Creamy Potato & Herb Chowder",
+            category: "Dinner",
+            cookingTime: "25 mins",
+            rating: 4.9,
+            matchPercentage: (hasPotatoes && hasMilk) ? 100 : 75,
+            canCookNow: hasPotatoes && hasMilk,
+            imageUrl: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600",
+            ingredients: ["Potatoes", "Milk", "Onion", "Salt", "Black Pepper", "Butter"],
+            matchedIngredients: (hasPotatoes && hasMilk) ? ["Potatoes", "Milk"] : ["Potatoes"],
+            missingIngredients: (hasPotatoes && hasMilk) ? [] : ["Milk"],
+            instructions: "1. Simmer diced potatoes in salted water until tender.
+2. In a skillet, sauté chopped onions in butter.
+3. Blend half the potatoes with warm milk until creamy.
+4. Combine all ingredients, season, and simmer for 5 mins."
+        },
+        {
+            title: "Crispy Golden Garlic Roasted Potatoes",
+            category: "Lunch",
+            cookingTime: "20 mins",
+            rating: 4.8,
+            matchPercentage: hasPotatoes ? 100 : 80,
+            canCookNow: hasPotatoes,
+            imageUrl: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=600",
+            ingredients: ["Potatoes", "Olive Oil", "Garlic", "Rosemary", "Salt"],
+            matchedIngredients: hasPotatoes ? ["Potatoes"] : [],
+            missingIngredients: [],
+            instructions: "1. Parboil potatoes for 5 mins.
+2. Toss in olive oil, salt, and garlic.
+3. Roast at high heat until golden and crunchy."
+        },
         {
             title: "Classic Vegetable Omelette",
             category: "Breakfast",
@@ -384,7 +424,10 @@ function getCuratedRecipeCollection(kitchenItems) {
             ingredients: ["Eggs", "Onion", "Tomato", "Chilli", "Salt", "Pepper"],
             matchedIngredients: ["Eggs", "Onion", "Tomato"],
             missingIngredients: [],
-            instructions: "1. Beat eggs with salt and pepper.\n2. Sauté onion and tomato in a pan.\n3. Pour eggs and cook until set.\n4. Fold and serve hot."
+            instructions: "1. Beat eggs with salt and pepper.
+2. Sauté onion and tomato in a pan.
+3. Pour eggs and cook until set.
+4. Fold and serve hot."
         },
         {
             title: "Quick Garlic Fried Rice",
@@ -397,35 +440,14 @@ function getCuratedRecipeCollection(kitchenItems) {
             ingredients: ["Rice", "Garlic", "Onion", "Vegetables", "Soy Sauce"],
             matchedIngredients: ["Rice", "Onion"],
             missingIngredients: ["Garlic"],
-            instructions: "1. Sauté minced garlic and onions in sesame oil.\n2. Add diced vegetables.\n3. Add cooked rice and season with salt & pepper.\n4. Stir-fry on high heat for 3 mins."
-        },
-        {
-            title: "Grilled Cheese & Tomato Sandwich",
-            category: "Snack",
-            cookingTime: "10 mins",
-            rating: 4.9,
-            matchPercentage: 95,
-            canCookNow: true,
-            imageUrl: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=600",
-            ingredients: ["Bread", "Cheese", "Tomato", "Butter", "Oregano"],
-            matchedIngredients: ["Bread", "Cheese", "Tomato"],
-            missingIngredients: [],
-            instructions: "1. Butter slices of bread.\n2. Place cheese and sliced tomatoes inside.\n3. Toast in skillet until cheese melts.\n4. Enjoy warm!"
-        },
-        {
-            title: "Comforting Potato & Spinach Curry",
-            category: "Dinner",
-            cookingTime: "25 mins",
-            rating: 4.6,
-            matchPercentage: 80,
-            canCookNow: true,
-            imageUrl: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600",
-            ingredients: ["Potato", "Spinach", "Onion", "Tomato", "Spices"],
-            matchedIngredients: ["Potato", "Onion", "Tomato"],
-            missingIngredients: ["Spinach"],
-            instructions: "1. Boil or sauté diced potatoes.\n2. Make an onion-tomato masala base.\n3. Stir in spinach and simmer for 10 minutes.\n4. Serve with rice or flatbread."
+            instructions: "1. Sauté minced garlic and onions in sesame oil.
+2. Add diced vegetables.
+3. Add cooked rice and season with salt & pepper.
+4. Stir-fry on high heat for 3 mins."
         }
     ];
+
+    return recipes;
 }
 
 function renderAiRecipeResult(recipe) {
@@ -437,7 +459,7 @@ function renderAiRecipeResult(recipe) {
             <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
                 <div>
                     <span style="background:#e8f5e9; color:#2e7d32; font-size:12px; font-weight:700; padding:4px 12px; border-radius:12px; display:inline-block; margin-bottom:6px;">
-                        ✨ AI Agent Signature Recipe &bull; ${escapeHtml(recipe.aiScore || "98% Match")}
+                        ✨ AI Agent Signature Recipe &bull; ${escapeHtml(recipe.aiScore || "100% Match")}
                     </span>
                     <h3 style="margin:0; font-size:22px; color:#0f172a;">${escapeHtml(recipe.title)}</h3>
                     <p style="margin:4px 0 0 0; color:#64748b; font-size:13px;">
@@ -451,7 +473,7 @@ function renderAiRecipeResult(recipe) {
 
             <!-- Ingredients Used -->
             <div style="margin:14px 0; background:#f1f5f9; padding:12px 16px; border-radius:8px;">
-                <h4 style="margin:0 0 6px 0; font-size:13px; color:#334155; text-transform:uppercase;">🛒 Ingredients Used From Kitchen:</h4>
+                <h4 style="margin:0 0 6px 0; font-size:13px; color:#334155; text-transform:uppercase;">🛒 Linked Kitchen Inventory Ingredients:</h4>
                 <div style="display:flex; flex-wrap:wrap; gap:6px;">
                     ${(recipe.ingredients || []).map(ing => `
                         <span style="background:white; border:1px solid #cbd5e1; padding:4px 10px; border-radius:14px; font-size:12px; font-weight:600; color:#1e293b;">

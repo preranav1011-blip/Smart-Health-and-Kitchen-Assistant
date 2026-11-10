@@ -23,6 +23,10 @@ class Medicine(db.Model):
     is_alarm_active = db.Column("isAlarmActive", db.Boolean, default=True)
     last_taken = db.Column("lastTaken", db.String(50), nullable=True)
 
+    @property
+    def name(self):
+        return self.medicine_name
+
     def to_dict(self):
         return {
             "id": self.id,
